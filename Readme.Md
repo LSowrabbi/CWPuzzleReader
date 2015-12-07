@@ -3,10 +3,10 @@
 
 
 * To run the command line version
-`python commandlineCW.py`
+`python3.4 commandlineCW.py`
 
 * to run GUI version 
-`python3 GUI.py`
+`python3.4 GUI.py` or use `idle3` and proceed with loading `GUI.py` and run
 
 * The software is developed using idle3 as IDE
 

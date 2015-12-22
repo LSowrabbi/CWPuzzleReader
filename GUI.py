@@ -288,7 +288,21 @@ class UI():
                  col=col_cellno[no_clicked-1]
                  UI.create_rect(row,col)
 
-
+    def change_state(c_state):
+        if(c_state=="disabled"):
+            UI.solnmenu.entryconfig(0,state=c_state)
+            UI.solnmenu.entryconfig(1,state=c_state)
+            UI.solnmenu.entryconfig(3,state=c_state)
+        else:
+            UI.solnmenu.entryconfig(0,state=check_reveal_state)
+            UI.solnmenu.entryconfig(1,state=check_reveal_state)
+            UI.solnmenu.entryconfig(3,state=unlock_state)
+        UI.filemenu.entryconfig(0,state=c_state)
+        UI.filemenu.entryconfig(1,state=c_state)
+        UI.filemenu.entryconfig(2,state=c_state)            
+        UI.filemenu.entryconfig(3,state=c_state) 
+        UI.viewmenu.entryconfig(0,state=c_state)
+        return
                     
     def key_pressed(event):         
             # associates character key pressed to the currently active cell in the grid
@@ -435,6 +449,7 @@ class UI():
            is_multi=0
            listbox.config(state=NORMAL)
            listbox1.config(state=NORMAL)
+           UI.change_state("normal")
            if(valid[row][col]==2):
                canvas.delete("temp_valid"+str(row)+","+str(col))
                canvas.delete("valid"+str(row)+","+str(col))
@@ -530,6 +545,7 @@ class UI():
         v=UI.check(row,col)
         if(v==True and is_multi==0):
            messagebox.showinfo("", "No incorrect letters found!!")
+           
     # checks all the letters in the highlighted word
     def check_word():
         global across_down
@@ -590,7 +606,13 @@ class UI():
     # reveals the solution for the given row and column of grid        
     def reveal_letter(i,j):
            global valid
-           if(is_multi==0):
+           correct_entry=False
+           if((is_puz_rebus==True) and (str(i)+","+str(j) in rebus_row_col)):
+               rebus_index=rebus_row_col.index(str(i)+","+str(j))
+               correct_entry=(rebus_content[rebus_index]==cellblock[i][j])
+           else:
+               correct_entry=(solnblock[i][j]==cellblock[i][j])
+           if(not(correct_entry)):
               nth_edit=1
               canvas.delete("temp_str"+str(i)+","+str(j))
               if "temp_str"+str(i)+","+str(j) in temp_str:
@@ -602,6 +624,7 @@ class UI():
               x=((ex0[i][j]+ex1[i][j])/2)+3
               y=((ey0[i][j]+ey1[i][j])/2)+3
               if solnblock[i][j]!="." and solnblock[i][j]!=":":
+                 pencil[i][j]=0
                  if(valid[i][j]!=0):
                     canvas.delete("temp_valid"+str(i)+","+str(j))
                     canvas.delete("valid"+str(i)+","+str(j))
@@ -625,16 +648,24 @@ class UI():
 
     # reveals the complete solution  
     def reveal_sol():
-                for i in range(0,cells):
-                    for j in range(0,width):
-                            UI.reveal_letter(i,j)
+        for i in range(0,cells):
+            for j in range(0,width):
+                UI.reveal_letter(i,j)
 
+
+    # reveals solution for incorrect entries 
+    def reveal_incorrect():
+        for i in range(0,cells):
+            for j in range(0,width):
+                if cellblock[i][j]!="-" and (cellblock[i][j]!="." and cellblock[i][j]!=":"):
+                    UI.reveal_letter(i,j)
+                            
      # reveals solution for all the cells in the highlighted word                           
     def reveal_word():
         global across_down
         i=row
         j=col
-        if cellblock[row][col]!="." and cellblock[row][col]!=":" and is_multi==0:       
+        if cellblock[row][col]!="." and cellblock[row][col]!=":":       
             UI.reveal_letter(row,col)
             if (across_down=="down"):
                 i=row-1
@@ -668,6 +699,7 @@ class UI():
         global multi,is_multi
         if (cellblock[row][col]!="." and cellblock[row][col]!=":" and is_multi==0 and valid[row][col]!=3):
             is_multi=1
+            UI.change_state("disabled")
             y0=(ey0[row][col]+ey1[row][col])/2
             x1=(ex1[row][col])+24
             canvas.create_rectangle(ex0[row][col],y0,x1,ey1[row][col],fill="white",tag="mult",outline="#0088B5")            
@@ -680,25 +712,24 @@ class UI():
             listbox.config(state=DISABLED)
             listbox1.config(state=DISABLED)
 
+
     # displays notes, if any, that comes along with the puzzle
     def show_notes():
        global notes
-       if(notes==""):
-          txt="Sorry, there were no notes available for this puzzle!!"
-       else:
-          txt=notes
+       txt=notes.decode(Encoding_2)
        messagebox.showinfo("Notes", txt)
 
     # can be used to start or stop the timer
     def time_modify(self):
         global time_state
-        if(time_state==1):           
-            time_state=0
-            UI.labelt.config(foreground="green")
-            UI.update_clock()
-        else:
-            time_state=1        
-            UI.labelt.config(foreground="red")
+        if(is_multi==0):
+            if(time_state==1):           
+                time_state=0
+                UI.labelt.config(foreground="green")
+                UI.update_clock()
+            else:
+                time_state=1        
+                UI.labelt.config(foreground="red")
 
     # constructs the initial state for the crossword grid
     def initUI():
@@ -811,29 +842,84 @@ class UI():
         filewrite(1,sec,time_state)
         messagebox.showinfo("", "saved successfully")
         
+    def check_key():
+        global check_reveal_state,unlock_state,soln_state,checksum_sol
+        ab=unscramble_solution(soln.decode(Encoding_2), width, height, int(key.get()))
+        window.destroy()
+        temp=""
+        c=0
+        for j in range(0,width):
+            c=j
+            for i in range(0,height):
+                if(ab[c]!=":" and ab[c]!="."):
+                    temp=temp+ab[c]
+                c=c+width
+        data=temp.encode(Encoding_2)
+        cksum=0
+        for c in data:
+            if (cksum & 0x0001):
+                cksum = ((cksum >> 1) | 0x8000)
+            else:
+                cksum = (cksum >> 1)
+            cksum = (cksum + c) & 0xffff
+        if (cksum==checksum_sol[0]):
+            messagebox.showinfo("", "The solution for the puzzle has been unlocked")
+            check_reveal_state="normal"
+            unlock_state="disabled"                      
+            UI.solnmenu.entryconfig(0,state=check_reveal_state)
+            UI.solnmenu.entryconfig(1,state=check_reveal_state)
+            UI.solnmenu.entryconfig(3,state=unlock_state)
+            soln_state[0]=0
+            checksum_sol[0]=0
+            temp=0
+            for i in range(0,height):
+                for j in range(0,width):
+                    solnblock[i][j]=ab[temp]
+                    temp=temp+1
+        else:
+            messagebox.showinfo("Sorry", "Wrong key")
+
+        
+    def unlock_soln():
+        global window,key
+        key=StringVar()
+        window = Toplevel(master)
+        Label(window, text="Enter the 4 digit key").pack()
+        e = Entry(window,textvariable=key)
+        e.pack(padx=5)
+        b = Button(window, text="Unlock", command=UI.check_key)
+        b.pack(pady=5)
+
+       
+
     initUI()
 
     # menubar
     menubar = Menu(master)
-    filemenu = Menu(menubar, tearoff=0)
     filemenu = Menu(menubar, tearoff=0)
     filemenu.add_command(label="Save", command=save_sol)
     filemenu.add_command(label="Clear Puzzle", command=clear_cells)
     filemenu.add_command(label="Multiple Entry", command=multiple_sol)
     filemenu.add_checkbutton(label="Use Pencil", variable = is_pencil, onvalue = 1, offvalue = 0)
     menubar.add_cascade(label="Edit", menu=filemenu)
-    checkmenu = Menu(menubar, tearoff=0)
+    solnmenu = Menu(menubar, tearoff=0)
+    checkmenu = Menu(solnmenu, tearoff=0)
     checkmenu.add_command(label="Check Letter", command=check_one)
     checkmenu.add_command(label="Check Word", command=check_word)
     checkmenu.add_command(label="Check Solution", command=check_all)
-    menubar.add_cascade(label="Check", menu=checkmenu)
-    revealmenu = Menu(menubar, tearoff=0)
+    solnmenu.add_cascade(label="Check", menu=checkmenu,state=check_reveal_state)
+    revealmenu = Menu(solnmenu, tearoff=0)
     revealmenu.add_command(label="Reveal Letter", command=reveal_one)
     revealmenu.add_command(label="Reveal Word", command=reveal_word)
+    revealmenu.add_command(label="Reveal Incorrect Letters", command=reveal_incorrect)
+    revealmenu.add_separator()
     revealmenu.add_command(label="Reveal Solution", command=reveal_sol)
-    menubar.add_cascade(label="Reveal", menu=revealmenu)
+    solnmenu.add_cascade(label="Reveal", menu=revealmenu,state=check_reveal_state)
+    solnmenu.add_separator()
+    solnmenu.add_command(label="Unlock",command=unlock_soln,state=unlock_state)   
+    menubar.add_cascade(label="Solution", menu=solnmenu)
     viewmenu = Menu(menubar, tearoff=0)
-    viewmenu.add_command(label="Notes", command=show_notes)
+    viewmenu.add_command(label="Notes", command=show_notes, state=notes_state)
     menubar.add_cascade(label="View", menu=viewmenu)
     master.config(menu=menubar,background="#D9DADA")   
 

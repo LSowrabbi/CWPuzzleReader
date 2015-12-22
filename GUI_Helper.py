@@ -7,7 +7,6 @@ import string
 import array
 from tkinter import *
 import tkinter.filedialog
-
 root = Tk()
 root.withdraw()
 root.update()
@@ -37,11 +36,14 @@ valid=[]
 lim=[]
 BLACKSQUARE = '.'
 time=0
-time_state=1
-
+time_state=0
+checksum_sol=[]
+checksum_sol.append(0)
+soln_state=[]
+soln_state.append(0)
 
 def filewrite(nth_edit,new_t,new_ts):
-    global ifil,Encoding_1,Encoding_2,Encoding_3,soln_state,puztype,soln,curn_state,b,ifile,valid_cksum
+    global ifil,Encoding_1,Encoding_2,Encoding_3,soln_state,puztype,soln,curn_state,b,ifile,valid_cksum,check_reveal_state,unlock_state,notes_state,checksum_sol
     global extra_sec_code,extra_sec_count,extra_sec_length,extra_sec_checksum,extra_sec_data,cluelist,ofile
     global width,height,cellno,solnblock,across,down,acc,dwn,title,aut,cpyrt,notes,time,time_state
     if(nth_edit==0):
@@ -66,8 +68,7 @@ def filewrite(nth_edit,new_t,new_ts):
     
         # notes that come along with the puzzle.
         notes=""
-
-
+        
         # list for storing across and down clues
         across=[]
         down=[]
@@ -122,9 +123,18 @@ def filewrite(nth_edit,new_t,new_ts):
    
         #  can have normal, scrambled or no solution
         solution_state=struct.unpack('H',b[50:52])
-        soln_state=solution_state[0]
-
-        # to find the previous null value in the string section, from the given location 'loc'.
+        soln_state[0]=solution_state[0]
+        temp_cs=struct.unpack('H',b[30:32])
+        if(soln_state[0]==4):
+            temp_cs=struct.unpack('H',b[30:32])
+            checksum_sol[0]=temp_cs[0]
+            check_reveal_state="disabled"
+            unlock_state="normal"
+        else:
+            check_reveal_state="normal"
+            unlock_state="disabled"
+            
+    # to find the previous null value in the string section, from the given location 'loc'.
     def prevzero(loc):
         j=loc-1
         while j>=0 and b[j]!=0:
@@ -154,6 +164,10 @@ def filewrite(nth_edit,new_t,new_ts):
                         # finds the notes that comes along with the puzzle
                         # notes=str(b[begn:i].decode('iso-8859-1'))
                         notes=b[begn:i]
+                        if(notes.decode(Encoding_2)==""):
+                            notes_state="disabled"
+                        else:
+                            notes_state="normal"
                         iterate=False
                 k=k+1
             i=i+1
@@ -225,7 +239,7 @@ def filewrite(nth_edit,new_t,new_ts):
 
     def findcurrdown(i,j):
         curstr=""
-        while(i!=height and (cellblock[i][j]!="." and cellblock[i][j]!=":")):
+        while((i<height) and (cellblock[i][j]!="." and cellblock[i][j]!=":")):
             curstr=curstr+cellblock[i][j]
             i=i+1
         return curstr
@@ -416,12 +430,17 @@ def filewrite(nth_edit,new_t,new_ts):
             else:
                 cksum = (cksum >> 1)
             cksum = (cksum + c) & 0xffff
-
         return cksum
 
     # calculates cib checksum
     def cib_cksum(cksum=0):
-        return cksum_region(b[44:52],cksum)
+        cksum = cksum_region(b[44:50],cksum)
+        if(soln_state[0]==0):
+            temp_soln_state=struct.pack('H',0x0000)
+        else:
+            temp_soln_state=b[50:52]  
+        cksum = cksum_region(temp_soln_state,cksum)
+        return cksum
 
     # calculates checksum for the string section
     def text_cksum(cksum=0):
@@ -438,7 +457,6 @@ def filewrite(nth_edit,new_t,new_ts):
             cksum = cksum_region(notes+b'\0', cksum)
         return cksum
     
-
 
     # calculates overall checksum : cib + solution + current state + string section
     def overall_checksum():
@@ -470,99 +488,10 @@ def filewrite(nth_edit,new_t,new_ts):
         calc_magic_high=calc_magichigh_temp[0]
         return calc_magic_high
 
-
-    # scrambles the solution and key given as argument     
-    def scramble_solution(solution, width, height, key):
-        sq = square(solution, width, height)
-        data = restore(sq, scramble_string(sq.replace('.', ''), key))
-        return square(data, height, width)
-
-
-    def scramble_string(s, key):
-        key = key_digits(key)
-        for k in key:
-            s = shift(s, key)
-            s = s[k:] + s[:k]
-            s = shuffle(s)
-        return s
-  
-    # unscrambles the scrambled solution with 'key'   
-    def unscramble_solution(scrambled, width, height, key):
-        sq = square(scrambled, width, height)
-        data = restore(sq, unscramble_string(sq.replace('.', ''), key))
-        return square(data, height, width)
-    
-    def unscramble_string(s, key):
-        key = key_digits(key)
-        l = len(s)
-        for k in key[::-1]:
-            s = unshuffle(s)
-            s = s[l-k:] + s[:l-k]
-            s = unshift(s, key)
-        return s
-
-    def data_cksum(data, cksum=0):
-        for b in data:
-            if isinstance(b, bytes):
-                b = ord(b)
-            # right-shift one with wrap-around
-            lowbit = (cksum & 0x0001)
-            cksum = (cksum >> 1)
-            if lowbit:
-                cksum = (cksum | 0x8000)
-    
-            # then add in the data and clear any carried bit past 16
-            cksum = (cksum + b) & 0xffff
-            return cksum
-
-
-    def scrambled_cksum(scrambled, width, height):
-        data = square(scrambled, width, height).replace(BLACKSQUARE, '')
-        print(data)
-        print(str(data_cksum(data.encode(Encoding_2))))
-
-    def key_digits(key):
-        return [int(c) for c in str(key).zfill(4)]
-
-    def square(data, w, h):
-        aa = [data[i:i+w] for i in range(0, len(data), w)]
-        return ''.join(
-            [''.join([aa[r][c] for r in range(0, h)]) for c in range(0, w)]
-        )
-
-    def shift(s, key):
-        atoz = string.ascii_uppercase
-        if s:
-            return ''.join(
-                atoz[(atoz.index(c) + key[i % len(key)]) % len(atoz)]
-                for i, c in enumerate(s)
-            )
-        else:
-            return ''
-
-    def unshift(s, key):
-        return shift(s, [-k for k in key])
-            
-    def shuffle(s):
-        mid = int(math.floor(len(s) / 2))
-        items = functools.reduce(operator.add, zip(s[mid:], s[:mid]))
-        return ''.join(items) + (s[-1] if len(s) % 2 else '')
-
-    def unshuffle(s):
-        return s[1::2] + s[::2]
-
-
-    def restore(s, t):
-        t = (c for c in t)
-        return ''.join(next(t) if not is_blacksquare(c) else c for c in s)
-
-    def is_blacksquare(c):
-        if isinstance(c, int):c = chr(c)
-        return c == '.'
-
+    if(nth_edit==0):
+    	# identifies rebus,circles and validity of cells
         calc_rebus()
         calc_gext()
-    if(nth_edit==0):
         # checks the different checksums against the calculated value   
         calc_cib= True 
         temp_cib=struct.unpack('H',b[14:16])
@@ -598,7 +527,7 @@ def filewrite(nth_edit,new_t,new_ts):
     if(nth_edit!=0):
         ofile=open(ifil,mode='wb')
         rebus_usr_entry=False
-        new_curn=('').encode("ISO-8859-1")
+        new_curn=('').encode(Encoding_2)
         # updates current state of the puzzle
         for i in range(0,height):
             for j in range(0,width):   
@@ -613,6 +542,15 @@ def filewrite(nth_edit,new_t,new_ts):
                 j=j+1
             i=i+1
         curn_state=new_curn
+        new_soln=('').encode(Encoding_2)
+        # updates solution block of the puzzle (if it has been unlocked in case of scrambled puzzles)
+        for i in range(0,height):
+            for j in range(0,width):   
+                temp=solnblock[i][j]
+                new_soln=new_soln+temp.encode(Encoding_2)       
+                j=j+1
+            i=i+1
+        soln=new_soln
         gib=overall_checksum()
         cib=cib_cksum()
         # header section
@@ -624,7 +562,16 @@ def filewrite(nth_edit,new_t,new_ts):
         mh=magic_high_cksum()
         ofile.write(struct.pack('I',ml))
         ofile.write(struct.pack('I',mh))
-        ofile.write(b[24:52])
+        ofile.write(b[24:30])
+        if(checksum_sol[0]==0):
+            ofile.write(struct.pack('H',0x0000))
+        else:
+            ofile.write(b[30:32])
+        ofile.write(b[32:50])
+        if(soln_state[0]==0):
+            ofile.write(struct.pack('H',0x0000))
+        else:
+            ofile.write(b[50:52])  
         ofile.write(soln)
         ofile.write(curn_state)
         # string section
@@ -642,16 +589,12 @@ def filewrite(nth_edit,new_t,new_ts):
         # extra section
         if(is_puz_rebus==True):
             for i in range (0,extra_sec_count):
-                if(extra_sec_code[i]==b'GRBS'):
+                if(extra_sec_code[i]==b'GRBS' or extra_sec_code[i]==b'RTBL'):
                     ofile.write(extra_sec_code[i])
-                    ofile.write(extra_sec_length[i])
-                    ofile.write(extra_sec_checksum[i])
-                    ofile.write(extra_sec_data[i])                               
-                if(extra_sec_code[i]==b'RTBL'):
-                    ofile.write(extra_sec_code[i])
-                    ofile.write(extra_sec_length[i])
-                    ofile.write(extra_sec_checksum[i])
-                    ofile.write(extra_sec_data[i]) 
+                    ofile.write(struct.pack('H',extra_sec_length[i])) 
+                    ofile.write(struct.pack('H',extra_sec_checksum[i])) 
+                    ofile.write(extra_sec_data[i])
+                    ofile.write(b'\0') 
         ofile.write(b'LTIM')
         new_time=str(new_t)
         new_time=new_time+","
@@ -694,7 +637,7 @@ def filewrite(nth_edit,new_t,new_ts):
             ofile.write(byte_gext)
             ofile.write(b'\0')
         if (rebus_usr_entry==True):
-            new_usr=('').encode("ISO-8859-1")
+            new_usr=('').encode(Encoding_2)
             for i in range (0,height):
                 for j in range (0,width):
                     if(len(cellblock[i][j])>1):
@@ -711,7 +654,52 @@ def filewrite(nth_edit,new_t,new_ts):
 
 filewrite(0,0,1)
 
+# unscrambles the scrambled solution with 'key'   
+def unscramble_solution(scrambled, width, height, key):
+    sq = square(scrambled, width, height)
+    data = restore(sq, unscramble_string(sq.replace('.', ''), key))
+    return square(data, height, width)
 
+def unscramble_string(s, key):
+    key = key_digits(key)
+    l = len(s)
+    for k in key[::-1]:
+        s = unshuffle(s)
+        s = s[l-k:] + s[:l-k]
+        s = unshift(s, key)
+    return s
+
+def key_digits(key):
+    return [int(c) for c in str(key).zfill(4)]
+
+def shift(s, key):
+    atoz = string.ascii_uppercase
+    if s:
+        return ''.join(
+            atoz[(atoz.index(c) + key[i % len(key)]) % len(atoz)]
+            for i, c in enumerate(s)
+        )
+    else:
+        return ''
+
+def unshift(s, key):
+    return shift(s, [-k for k in key])
+
+def unshuffle(s):
+    return s[1::2] + s[::2]
+    
+def square(data, w, h):
+    aa = [data[i:i+w] for i in range(0, len(data), w)]
+    return ''.join([''.join([aa[r][c] for r in range(0, h)]) for c in range(0, w)])
+
+def restore(s, t):
+    t = (c for c in t)
+    return ''.join(next(t) if not is_blacksquare(c) else c for c in s)
+
+def is_blacksquare(c):
+    if isinstance(c, int):
+        c = chr(c)
+    return c == '.'
 
     
 

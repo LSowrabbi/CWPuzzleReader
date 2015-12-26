@@ -569,7 +569,11 @@ def unlock_soln():
     key = input("Enter the 4 digit key : ") 
     check_key(key)
 
-
+# quits program if checksum does not match
+if(valid_cksum==False):
+        print("Sorry, the file has been corrupted")
+        sys.exit(0)
+        
 time_state=1
 ip=1
 print('Enter 1 to Display the option menu anytime')

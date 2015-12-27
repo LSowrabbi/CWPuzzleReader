@@ -576,6 +576,8 @@ if(valid_cksum==False):
         
 time_state=1
 ip=1
+calc_across()
+calc_down()
 print('Enter 1 to Display the option menu anytime')
 while(ip!=0):
         ip = input('Enter your option: ')

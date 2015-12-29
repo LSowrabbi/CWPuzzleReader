@@ -352,9 +352,8 @@ class UI():
 
     # makes cell to the left as the currently active cell and current mode to across           
     def key_pressedL(event):
-       global nth_edit,row,col,across_down,taglist
-       if(is_multi==0):
-           across_down="across"
+       global row,col,across_down,taglist
+       if(is_multi==0 and across_down=="across"):
            if col-1>=0:
                c_col=col-1
                if cellblock[row][c_col]=="." or cellblock[row][c_col]==":":
@@ -366,12 +365,14 @@ class UI():
                if (cellblock[row][c_col]!="." and cellblock[row][c_col]!=":"):
                         col=c_col
            UI.create_rect(row,col)
-
+       if(is_multi==0 and across_down=="down"):
+           across_down="across"
+           UI.create_rect(row,col)
+           
     # makes cell to the right as the currently active cell and current mode to across  
     def key_pressedR(event):
-        global nth_edit,row,col,across_down,taglist
-        if(is_multi==0):
-            across_down="across"
+        global row,col,across_down,taglist
+        if(is_multi==0 and across_down=="across"):
             if col+1<width:
                 c_col=col+1
                 if cellblock[row][c_col]=="." or cellblock[row][c_col]==":":
@@ -382,13 +383,15 @@ class UI():
                             c_col=c_col+1
                 if (cellblock[row][c_col]!="." and cellblock[row][c_col]!=":"):
                     col=c_col
-        UI.create_rect(row,col)
-  
+            UI.create_rect(row,col)
+        if(is_multi==0 and across_down=="down"):
+           across_down="across"
+           UI.create_rect(row,col)
+           
     # makes cell upper to the highlighted cell as the currently active cell  and current mode to down
     def key_pressedU(event):
-        if(is_multi==0):
-            global nth_edit,row,col,across_down,taglist
-            across_down="down"
+        global row,col,across_down,taglist
+        if(is_multi==0 and across_down=="down"):
             if row-1>=0:
                 c_row=row-1
                 if cellblock[c_row][col]=="." or cellblock[c_row][col]==":":
@@ -399,23 +402,29 @@ class UI():
                             c_row=c_row-1
                 if (cellblock[c_row][col]!="." and cellblock[c_row][col]!=":"):
                     row=c_row
-        UI.create_rect(row,col)
+            UI.create_rect(row,col)
+        if(is_multi==0 and across_down=="across"):
+           across_down="down"
+           UI.create_rect(row,col)
 
     # makes cell below the highlighted cell as the currently active cell  and current mode to down
     def key_pressedD(event):
-        global nth_edit,row,col,across_down,taglist
-        across_down="down"
-        if row+1<cells:
-            c_row=row+1
-            if cellblock[c_row][col]=="." or cellblock[c_row][col]==":":
-                while(cellblock[c_row][col]=="." or cellblock[c_row][col]==":"):
-                    if c_row+1==cells:
-                        break
-                    else:
-                        c_row=c_row+1
-            if (cellblock[c_row][col]!="." and cellblock[c_row][col]!=":"):
-                        row=c_row
-        UI.create_rect(row,col)
+        global row,col,across_down,taglist
+        if(is_multi==0 and across_down=="down"):
+            if row+1<cells:
+                c_row=row+1
+                if cellblock[c_row][col]=="." or cellblock[c_row][col]==":":
+                    while(cellblock[c_row][col]=="." or cellblock[c_row][col]==":"):
+                        if c_row+1==cells:
+                            break
+                        else:
+                            c_row=c_row+1
+                if (cellblock[c_row][col]!="." and cellblock[c_row][col]!=":"):
+                    row=c_row
+            UI.create_rect(row,col)
+        if(is_multi==0 and across_down=="across"):
+           across_down="down"
+           UI.create_rect(row,col)
 
     # assigns rebus entry to the corresponding cellblock when 'enter' key is pressed
     def key_pressedE(event):

@@ -1,5 +1,10 @@
 from commandlineHelper import *
 
+for i in range(0,height):
+        for j in range(0,width):
+                if(cellblock[i][j]!="." and cellblock[i][j]!=":" and pencil[i][j]==0):
+                        cellblock[i][j]=cellblock[i][j].upper()
+                        
 # calc_across and calc_down are for calculating current state of the across and down clues respectively
 def calc_across():
         for i in range(0,acc):
@@ -22,6 +27,21 @@ def calc_down():
                 curstr=curstr+cellblock[c_row][c_col]
                 c_row=c_row+1            
             down[i][3]=curstr
+
+def is_sol_complete():
+        for i in range(0,height):
+            for j in range(0,width):
+                if(cellblock[i][j]=="-"):
+                    return       
+                if(cellblock[i][j]!="." and cellblock[i][j]!=":" and valid[i][j]!=3):
+                    if((is_puz_rebus==True) and (str(i)+","+str(j) in rebus_row_col)):
+                        rebus_index=rebus_row_col.index(str(i)+","+str(j))
+                        temp_text=rebus_content[rebus_index]
+                    else:
+                        temp_text=solnblock[i][j]
+                    if(cellblock[i][j]!=temp_text):
+                        return           
+        print("Congratulations, You have successfully completed the puzzle") 
 
 # displays clue and asks user to enter a solution for the corresponding clue            
 def disp_clue(clue):         
@@ -569,11 +589,14 @@ def unlock_soln():
     key = input("Enter the 4 digit key : ") 
     check_key(key)
 
+
+
 # quits program if checksum does not match
 if(valid_cksum==False):
         print("Sorry, the file has been corrupted")
         sys.exit(0)
-        
+
+
 time_state=1
 ip=1
 calc_across()
@@ -593,9 +616,11 @@ while(ip!=0):
         if(ip=="2"):
             clue= input('Enter clue number (for e.g "1 across"): ')
             disp_clue(clue)
+            is_sol_complete()
         if(ip=="3"):
             clue= input('Enter clue number (for e.g "1 across"): ')            
             disp_rebus_clue(clue)
+            is_sol_complete()
         if(ip=="4"):
             print('Across:')
             view_acc()
@@ -629,10 +654,13 @@ while(ip!=0):
                 choice=input(' 1 : Reveal letter\n 2 : Reveal word\n 3 : Reveal entire grid\n')  
                 if choice=="1":
                     reveal_one()
+                    is_sol_complete()
                 if choice=="2":
                     reveal_word()
+                    is_sol_complete()
                 if choice=="3":
                     reveal_sol()
+                    is_sol_complete()
             else:
                 print("Sorry you must unlock the solution first to check or reveal the grid")
         if(ip=="11"):
@@ -649,3 +677,8 @@ while(ip!=0):
         if(ip=="0"):
             print("Thank you!!")
             break
+
+
+
+
+

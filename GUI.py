@@ -7,7 +7,7 @@ if(valid_cksum==False):
     master.withdraw()
     messagebox.showinfo("Sorry!", "File corrupted")
     sys.exit(0)
-nth_edit=0
+
 MARGIN=10
 cells=height
 screen_width = master.winfo_screenwidth()
@@ -304,9 +304,24 @@ class UI():
         UI.viewmenu.entryconfig(0,state=c_state)
         return
                     
+    def is_sol_complete():
+        for i in range(0,height):
+            for j in range(0,width):
+                if(cellblock[i][j]=="-"):
+                    return       
+                if(cellblock[i][j]!="." and cellblock[i][j]!=":" and valid[i][j]!=3):
+                    if((is_puz_rebus==True) and (str(i)+","+str(j) in rebus_row_col)):
+                        rebus_index=rebus_row_col.index(str(i)+","+str(j))
+                        temp_text=rebus_content[rebus_index]
+                    else:
+                        temp_text=solnblock[i][j]
+                    if(cellblock[i][j]!=temp_text):
+                        return           
+        messagebox.showinfo("Congratulations!", "You have successfully completed the puzzle") 
+              
     def key_pressed(event):         
             # associates character key pressed to the currently active cell in the grid
-            global nth_edit,row,col,across_down,taglist,temp_str,is_multi,multi,is_pencil,pencil,valid,temp_valid
+            global row,col,across_down,taglist,temp_str,is_multi,multi,is_pencil,pencil,valid,temp_valid
             if(is_multi==1):
                 # for rebus entries
                 if(len(multi)<8):
@@ -321,7 +336,7 @@ class UI():
                 if row>=0 and col>=0 and event.keysym in 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' and cellblock[row][col]!="." and cellblock[row][col]!=":":
                     # proceeds if solution hasen't been revealed yet
                     if(valid[row][col]!=3):
-                       nth_edit=nth_edit+1
+                       prev_str=cellblock[row][col]
                        if str(row)+","+str(col) in taglist:
                            canvas.delete(str(row)+","+str(col))
                            canvas.delete("temp_str"+str(row)+","+str(col))
@@ -344,11 +359,15 @@ class UI():
                               temp_valid.remove("temp_valid"+str(row)+","+str(col))
                            canvas.create_polygon(ex1[row][col]-8,ey0[row][col]+1,ex1[row][col],ey0[row][col]+1,ex1[row][col],ey0[row][col]+8,tag=("valid"+str(row)+","+str(col)),fill="black")
                            valid[row][col]=1
+                       if(prev_str!=cellblock[row][col]):
+                           UI.is_sol_complete()
                     if(across_down=="across" and col+1<width and cellblock[row][col+1]!="." and cellblock[row][col+1]!=":"):
                         col=col+1
                     if(across_down=="down" and row+1<cells and cellblock[row+1][col]!="." and cellblock[row+1][col]!=":"):
                         row=row+1
                     UI.create_rect(row,col)
+
+                        
 
     # makes cell to the left as the currently active cell and current mode to across           
     def key_pressedL(event):
@@ -428,7 +447,7 @@ class UI():
 
     # assigns rebus entry to the corresponding cellblock when 'enter' key is pressed
     def key_pressedE(event):
-       global nth_edit,row,col,across_down,taglist,multi,is_multi
+       global row,col,across_down,taglist,multi,is_multi
        if(is_multi==1):
            if str(row)+","+str(col) in taglist:
                 canvas.delete(str(row)+","+str(col))
@@ -466,10 +485,11 @@ class UI():
                canvas.create_polygon(ex1[row][col]-8,ey0[row][col]+1,ex1[row][col],ey0[row][col]+1,ex1[row][col],ey0[row][col]+8,tag=("valid"+str(row)+","+str(col)),fill="black")
                valid[row][col]=1
                UI.create_rect(row,col)
-    
+           UI.is_sol_complete()
+        
     # deletes a letter from the cell when 'backspace' key is pressed        
     def key_pressedB(event):
-       global nth_edit,row,col,across_down,taglist,multi,is_multi
+       global row,col,across_down,taglist,multi,is_multi
        if(is_multi==1 and len(multi)>0):         
            canvas.delete("mults")
            x=(ex0[row][col]+ex1[row][col])/2
@@ -492,9 +512,8 @@ class UI():
     
     #clears all the entries in the cells and temporary lists        
     def clear_cells():
-            global nth_edit,temp_str
+            global temp_str
             if(is_multi==0):
-                nth_edit=nth_edit+1
                 global taglist
                 for element in taglist:
                     canvas.delete(element)
@@ -509,6 +528,7 @@ class UI():
                     for j in range(0,width):
                         canvas.delete("valid"+str(i)+","+str(j))
                         valid[i][j]=0
+                        pencil[i][j]=0
                         if cellblock[i][j]!="." and cellblock[i][j]!=":":
                             cellblock[i][j]="-"
  
@@ -622,7 +642,6 @@ class UI():
            else:
                correct_entry=(solnblock[i][j]==cellblock[i][j])
            if(not(correct_entry)):
-              nth_edit=1
               canvas.delete("temp_str"+str(i)+","+str(j))
               if "temp_str"+str(i)+","+str(j) in temp_str:
                   temp_str.remove("temp_str"+str(i)+","+str(j))
@@ -654,13 +673,14 @@ class UI():
     # reveals the currently highlighted letter in the grid   
     def reveal_one():
         UI.reveal_letter(row,col)
+        UI.is_sol_complete()
 
     # reveals the complete solution  
     def reveal_sol():
         for i in range(0,cells):
             for j in range(0,width):
                 UI.reveal_letter(i,j)
-
+        UI.is_sol_complete()
 
     # reveals solution for incorrect entries 
     def reveal_incorrect():
@@ -668,7 +688,8 @@ class UI():
             for j in range(0,width):
                 if cellblock[i][j]!="-" and (cellblock[i][j]!="." and cellblock[i][j]!=":"):
                     UI.reveal_letter(i,j)
-                            
+        UI.is_sol_complete()
+        
      # reveals solution for all the cells in the highlighted word                           
     def reveal_word():
         global across_down
@@ -702,7 +723,8 @@ class UI():
                         j=j+1
                     if (i == cells or j==width):
                         break
-
+        UI.is_sol_complete()
+        
     # when a multiple entry has to be placed in a cell, can be exited only when 'enter' key is prressed.
     def multiple_sol():
         global multi,is_multi
@@ -814,6 +836,7 @@ class UI():
                         # pencil entry
                         if(gext[i][j] in [1,6,7,8,9,13,14,15]):
                            pencil[i][j]=1
+                           cellblock[i][j]=cellblock[i][j].upper()
                            canvas.create_text(x, y, text=temp_text.upper(), tag=(str(i)+","+str(j)), font=("Arial",16,"bold"), fill="#4D4D4D")
                         else:
                            canvas.create_text(x, y, text=temp_text, tag=(str(i)+","+str(j)), font=("Arial",16,"bold"), fill="black")

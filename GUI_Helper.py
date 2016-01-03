@@ -58,14 +58,13 @@ def filewrite(nth_edit,new_t,new_ts):
         # width and height of the crossword grid.    
         width=b[44]
         height=b[45]
-
         # 'a' denotes no. of clues present in the puzzle, no_of_clues is for accessing the last clue in the list.    
         clues=[]
         clues=struct.unpack('H',b[46:48])
         a=clues[0]
         cluelist = []
         no_of_clues=a-1
-    
+        
         # notes that come along with the puzzle.
         notes=""
         
@@ -78,7 +77,7 @@ def filewrite(nth_edit,new_t,new_ts):
 
         # no. of cells in the grid
         cells=width*height
-
+        
         # counter variable to access cluelist
         num=0
         
@@ -104,9 +103,10 @@ def filewrite(nth_edit,new_t,new_ts):
         n=curntsn+cells
         # binary form of solution of the puzzle
         soln=b[solun:curntsn]
+
         # binary form of current state of the puzzle
         curn_state=b[curntsn:n]
-    
+
         # offset for title in the string section
         start=n
         # loop counter variable for string section
@@ -126,7 +126,6 @@ def filewrite(nth_edit,new_t,new_ts):
         soln_state[0]=solution_state[0]
         temp_cs=struct.unpack('H',b[30:32])
         if(soln_state[0]==4):
-            temp_cs=struct.unpack('H',b[30:32])
             checksum_sol[0]=temp_cs[0]
             check_reveal_state="disabled"
             unlock_state="normal"
@@ -275,7 +274,7 @@ def filewrite(nth_edit,new_t,new_ts):
                 if i<height-1 and (cellblock[i+1][j]!="." and cellblock[i+1][j]!=":")  :       
                     if (cellblock[i][j]!="." and cellblock[i][j]!=":") and (i==0 or (cellblock[i-1][j]=="." or cellblock[i-1][j]==":")):
                         down.append([])
-                        if (cellblock[i][j]!="." and cellblock[i][j]!=":") and (j==0 or (cellblock[i][j-1]=="." or cellblock[i][j-1]==":")):
+                        if j<width-1 and (cellblock[i][j]!="." and cellblock[i][j]!=":") and (j==0 or (cellblock[i][j-1]=="." or cellblock[i][j-1]==":")):
                         # if cell no. matches with across cell no., count won't be incremented.
                             down[dwn].append(count-1)
                         else:
@@ -323,7 +322,10 @@ def filewrite(nth_edit,new_t,new_ts):
                         while(temp_s[temp]!=';'):
                             temp_str=temp_str+str(temp_s[temp])
                             temp=temp+1
-                        rebus_id=int(temp_s[j-1])
+                        if(temp_s[j-2]==" "):
+                            rebus_id=int(temp_s[j-1])
+                        else:
+                            rebus_id=int(temp_s[j-2:j])
                         for k in range (0,len(rebus_no)):
                             if(rebus_no[k]==rebus_id):
                                 rebus_content[k]=temp_str
@@ -444,6 +446,7 @@ def filewrite(nth_edit,new_t,new_ts):
 
     # calculates checksum for the string section
     def text_cksum(cksum=0):
+        global cktrial
         if(title):
             cksum = cksum_region(title+b'\0', cksum)
         if(aut):
@@ -452,7 +455,7 @@ def filewrite(nth_edit,new_t,new_ts):
             cksum = cksum_region(cpyrt+b'\0', cksum)
         for clue in cluelist:
             if(clue):
-                cksum = cksum_region(clue, cksum)
+                cksum = cksum_region(clue, cksum)       
         if(notes):
             cksum = cksum_region(notes+b'\0', cksum)
         return cksum

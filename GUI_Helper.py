@@ -446,7 +446,6 @@ def filewrite(nth_edit,new_t,new_ts):
 
     # calculates checksum for the string section
     def text_cksum(cksum=0):
-        global cktrial
         if(title):
             cksum = cksum_region(title+b'\0', cksum)
         if(aut):

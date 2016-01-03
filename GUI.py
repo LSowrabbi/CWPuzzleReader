@@ -68,8 +68,8 @@ prevx0,prevy0,prevx1,prevy1=0,0,0,0
 first_row_col=True
 across_down="across"
 a=0
-cur_clue=1
-dull_clue=1
+cur_clue=0
+dull_clue=0
 cur_clue_ad="across"
 dull_clue_ad="down"
 found_cur=0
@@ -129,66 +129,95 @@ class UI():
     def highlightclue(c_row,c_col):
         # if across_down = "Across" then dull clue = down and cur_clue = across, else vice versa
         d_col=c_col
-        global dull_clue,cur_clue,dull_clue_ad,cur_clue_ad
+        disp_clue=""
+        global dull_clue,cur_clue,dull_clue_ad,cur_clue_ad,cur_bool
         # clears previous dull and current clues
+        cur_bool=True
         if(dull_clue_ad=="across"):
-            listbox.selection_clear(dull_clue)
+            if(acc!=0):
+                listbox.selection_clear(dull_clue)
         else:
-            listbox1.selection_clear(dull_clue)
+            if(dwn!=0):
+                listbox1.selection_clear(dull_clue)
         if(cur_clue_ad=="across"):
-            listbox.selection_clear(cur_clue)
+            if(acc!=0):
+                listbox.selection_clear(cur_clue)
         else:
-            listbox1.selection_clear(cur_clue)
+            if(dwn!=0):
+                listbox1.selection_clear(cur_clue)
         # reconfigures the foreground color of dull clues to red
         if(dull_clue_ad=="across"):
-            listbox.itemconfig(dull_clue,selectbackground="gray",selectforeground="red")
+            if(acc!=0):
+                listbox.itemconfig(dull_clue,selectbackground="gray",selectforeground="red")
         else:
-            listbox1.itemconfig(dull_clue,selectbackground="gray",selectforeground="red")
+            if(dwn!=0):
+                listbox1.itemconfig(dull_clue,selectbackground="gray",selectforeground="red")
+        if across_down=="across":
+            cur_clue_ad="across"
+            dull_clue_ad="down"
+        else:
+            cur_clue_ad="down"
+            dull_clue_ad="across"
         # finds new dull and current clues
-        while((cellblock[c_row][c_col]!='.' and cellblock[c_row][c_col]!=':') and c_col!=0):
+        while(c_col!=0 and cellblock[c_row][c_col]!='.'):
             c_col=c_col-1
-        if(cellblock[c_row][c_col]=='.' or cellblock[c_row][c_col]==':'):
+        if(cellblock[c_row][c_col]=='.'):
             c_col=c_col+1
-        for i in range(0,acc):
-            if(cellno[c_row][c_col]==across[i][0]):
-                if across_down=="across":
-                    cur_clue_ad="across"
-                    cur_clue=i
-                else:
-                    dull_clue=i
-                    dull_clue_ad="across"
-                break
-        while((cellblock[c_row][d_col]!='.' and cellblock[c_row][d_col]!=':') and c_row!=0):
+        for i in range(0,acc+1):
+            if(i!=acc):
+                if(cellno[c_row][c_col]==across[i][0]):
+                    if across_down=="across":
+                        cur_clue=i
+                    else:
+                        dull_clue=i
+                    break
+        if i==acc:
+            if across_down=="across":
+                cur_bool=False
+                cur_clue=0
+            else:
+                dull_clue=0
+        while(c_row!=0 and cellblock[c_row][d_col]!='.'):
             c_row=c_row-1
-        if(cellblock[c_row][d_col]=='.' or cellblock[c_row][d_col]==':'):
+        if(cellblock[c_row][d_col]=='.'):
             c_row=c_row+1
-        for i in range(0,dwn):
-            if(cellno[c_row][d_col]==down[i][0]):
-                if across_down=="down":
-                    cur_clue_ad="down"
-                    cur_clue=i
-                else:
-                    dull_clue=i
-                    dull_clue_ad="down"
-                break
+        for i in range(0,dwn+1):
+            if(i!=dwn):
+                if(cellno[c_row][d_col]==down[i][0]):
+                    if across_down=="down":
+                        cur_clue=i
+                    else:
+                        dull_clue=i
+                    break
+        if i==dwn:
+            if across_down=="down":
+                cur_bool=False
+                cur_clue=0
+            else:
+                dull_clue=0
         # highlights dull and current clues and reconfigures foreground color of dull clue
         if(cur_clue_ad=="across"):
-            listbox.selection_set(first=cur_clue)
-            disp_clue=listbox.get(cur_clue)
-            listbox.see(cur_clue)
+            if(acc!=0):
+                listbox.selection_set(first=cur_clue)
+                disp_clue=across[cur_clue][1]
+                listbox.see(cur_clue)
         else:
-            listbox1.selection_set(first=cur_clue)
-            disp_clue=listbox1.get(cur_clue)
-            listbox1.see(cur_clue)
+            if(dwn!=0):
+                listbox1.selection_set(first=cur_clue)
+                disp_clue=down[cur_clue][1]
+                listbox1.see(cur_clue)
         if(dull_clue_ad=="across"):
-            listbox.itemconfig(dull_clue,selectbackground="gray",selectforeground="black")
-            listbox.selection_set(first=dull_clue)
-            listbox.see(dull_clue)
+            if(acc!=0):
+                listbox.itemconfig(dull_clue,selectbackground="gray",selectforeground="black")
+                listbox.selection_set(first=dull_clue)
+                listbox.see(dull_clue)
         else:
-            listbox1.itemconfig(dull_clue,selectbackground="gray",selectforeground="black")
-            listbox1.selection_set(first=dull_clue)
-            listbox1.see(dull_clue)
+            if(dwn!=0):
+                listbox1.itemconfig(dull_clue,selectbackground="gray",selectforeground="black")
+                listbox1.selection_set(first=dull_clue)
+                listbox1.see(dull_clue)
         UI.labelc.config(text=disp_clue)
+
                 
     def create_rect(c_row,c_col):
         # highlights word corresponding to the currently active row and col
@@ -764,7 +793,7 @@ class UI():
 
     # constructs the initial state for the crossword grid
     def initUI():
-            global row,col,n,cells,width,title,Encoding_2,listbox,listbox1,first_row_col,is_pencil
+            global row,col,n,cells,width,title,Encoding_2,listbox,listbox1,first_row_col,is_pencil,cur_clue_ad,dull_clue_ad
             master.title(title.decode(Encoding_2))
             is_pencil=IntVar()
             # creates grid
@@ -815,10 +844,14 @@ class UI():
                         if(first_row_col):
                              row=i
                              col=j
-                             if(cellblock[i][j+1]!="." and cellblock[i][j+1]!=":"):
+                             if((j+1<width) and cellblock[i][j+1]!="." and cellblock[i][j+1]!=":"):
                                  across_down="across"
+                                 cur_clue_ad="across"
+                                 dull_clue_ad="down"
                              else:
                                  across_down="down"
+                                 cur_clue_ad="down"
+                                 dull_clue_ad="across"
                              first_row_col=False
                     if cellblock[i][j]=="." or cellblock[i][j]==":":
                         canvas.create_rectangle(ex0[i][j], ey0[i][j], ex1[i][j], ey1[i][j],fill="black")
@@ -997,6 +1030,7 @@ class UI():
     canvas.bind("<Down>",key_pressedD)
     row,col=0,0
 
+
     # updates clock every 1000 milliseconds
     def update_clock():
         global sec,time_state
@@ -1007,7 +1041,6 @@ class UI():
            now = "%d:%02d:%02d" % (h, m, s)
            UI.labelt.configure(text=now)
            master.after(1000, UI.update_clock)
-
 
 
 UI.create_rect(row,col)

@@ -272,7 +272,7 @@ def filewrite(nth_edit):
                     if (cellblock[i][j]!="." and cellblock[i][j]!=":") and (i==0 or (cellblock[i-1][j]=="." or cellblock[i-1][j]==":")):
                         down.append([])
                         temp_str=""
-                        if (cellblock[i][j]!="." and cellblock[i][j]!=":") and (j==0 or (cellblock[i][j-1]=="." or cellblock[i][j-1]==":")):
+                        if j<width-1 and (cellblock[i][j]!="." and cellblock[i][j]!=":") and (j==0 or (cellblock[i][j-1]=="." or cellblock[i][j-1]==":")):
                         # if cell no. matches with across cell no., count won't be incremented.
                             down[dwn].append(count-1)
                         else:
@@ -322,7 +322,10 @@ def filewrite(nth_edit):
                         while(temp_s[temp]!=';'):
                             temp_str=temp_str+str(temp_s[temp])
                             temp=temp+1
-                        rebus_id=int(temp_s[j-1])
+                        if(temp_s[j-2]==" "):
+                            rebus_id=int(temp_s[j-1])
+                        else:
+                            rebus_id=int(temp_s[j-2:j])
                         for k in range (0,len(rebus_no)):
                             if(rebus_no[k]==rebus_id):
                                 rebus_content[k]=temp_str

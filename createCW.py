@@ -119,6 +119,20 @@ def initUI0(cb,w,h):
                 ey0[row].append(ey0[(row-1)][col]+SIDE)
                 ex1[row].append(ex1[(row-1)][col])
                 ey1[row].append(ey1[(row-1)][col]+SIDE)
+    i=1
+    row=0
+    for col in range(0,width):
+        x = ex0[row][col]+8
+        y = ey0[row][col]+8
+        canvas.create_text(x, y, text=str(i), font=("Times New Roman",10), fill="black")
+        i=i+1
+    i=1
+    col=0
+    for row in range (0,height):
+        x = ex0[row][col]+8
+        y = ey0[row][col]+8
+        canvas.create_text(x, y, text=str(i), font=("Times New Roman",10), fill="black")
+        i=i+1
     clear_button=Button(master,text="Clear cells", command=clear_cells)
     clear_button.pack(fill= Y, side=LEFT)
     apply_symmetry=Button(master,text="Apply diagonal symmetry", command=symmetry)

@@ -2,7 +2,8 @@ from commandlineHelper import *
 
 for i in range(0,height):
         for j in range(0,width):
-                if(cellblock[i][j]!="." and cellblock[i][j]!=":" and pencil[i][j]==0):
+                if(cellblock[i][j] in 'abcdefghijklmnopqrstuvwxyz'):
+                        pencil[i][j]=1
                         cellblock[i][j]=cellblock[i][j].upper()
                         
 # calc_across and calc_down are for calculating current state of the across and down clues respectively

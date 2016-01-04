@@ -867,7 +867,7 @@ class UI():
                         if(len(temp_text)>2):
                            temp_text=temp_text[0:2]+".."
                         # pencil entry
-                        if(gext[i][j] in [1,6,7,8,9,13,14,15]):
+                        if(gext[i][j] in [1,6,7,8,9,13,14,15] or cellblock[i][j] in 'abcdefghijklmnopqrstuvwxyz'):
                            pencil[i][j]=1
                            cellblock[i][j]=cellblock[i][j].upper()
                            canvas.create_text(x, y, text=temp_text.upper(), tag=(str(i)+","+str(j)), font=("Arial",16,"bold"), fill="#4D4D4D")

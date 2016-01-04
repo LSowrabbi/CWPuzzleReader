@@ -36,7 +36,7 @@ def cell_clicked0(event):
                 canvas.create_rectangle(x0, y0, x1, y1,fill="black", tags=str(row)+","+str(col))
 
 
-def clear_cells():
+def clear_cells0():
     canvas.delete("cursor")
     for i in range(0,height):   
         for j in range(0,width):
@@ -133,7 +133,7 @@ def initUI0(cb,w,h):
         y = ey0[row][col]+8
         canvas.create_text(x, y, text=str(i), font=("Times New Roman",10), fill="black")
         i=i+1
-    clear_button=Button(master,text="Clear cells", command=clear_cells)
+    clear_button=Button(master,text="Clear cells", command=clear_cells0)
     clear_button.pack(fill= Y, side=LEFT)
     apply_symmetry=Button(master,text="Apply diagonal symmetry", command=symmetry)
     apply_symmetry.pack(fill=Y, side=LEFT)

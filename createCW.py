@@ -135,7 +135,7 @@ def initUI0(cb,w,h):
         i=i+1
     clear_button=Button(master,text="Clear cells", command=clear_cells0)
     clear_button.pack(fill= Y, side=LEFT)
-    apply_symmetry=Button(master,text="Apply diagonal symmetry", command=symmetry)
+    apply_symmetry=Button(master,text="Apply rotational symmetry", command=symmetry)
     apply_symmetry.pack(fill=Y, side=LEFT)
     nexts=Button(master,text="Next", command=nxts)
     nexts.pack(fill=Y, side=LEFT)

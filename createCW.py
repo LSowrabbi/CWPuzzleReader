@@ -677,7 +677,10 @@ def textentered(event=0):
             listbox1.delete(cur_clue)
             listbox1.insert(cur_clue,("  "+str(down[cur_clue][0])+".  "+ip))            
     else:
-        msg=across_down+" clue cannot be entered for this block"
+        if(ip==""):
+            msg="Clue cannot be a null string"
+        else:
+            msg=across_down+" clue cannot be entered for this block"
         messagebox.showinfo("Sorry!", msg)
     canvas.focus_set()
     create_rect(row,col)

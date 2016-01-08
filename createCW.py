@@ -1,8 +1,11 @@
 from tkinter import *
 from createCW_Helper import *
+from createCW_readtxt import *
+from createCW_readpuz import *
 import tkinter.filedialog
 master = Tk()
 cellblock=[]
+
 class File():
     title=None
     author=None
@@ -244,6 +247,66 @@ def createEntryWindow():
     b.pack(pady=5,fill=Y)
     master.mainloop()
 
+def comboWindow():
+    global choice,choices,options,window0,option
+    option = ["Create new .puz","Open partially completed text file","Open .puz file"]
+    window0 = Toplevel(master)
+    master.withdraw()
+    fm=Frame(window0,width=60,height=20)
+    fm.pack(side=TOP, anchor=NW,fill=BOTH,expand=TRUE)
+    l=Label(fm, text="Enter your option")
+    l.pack(side=LEFT)
+    l.config(anchor=W,width=20,padx=5)
+    choices= StringVar(window0)
+    choices.set(option[0])
+    choice=option[0]
+    options = OptionMenu(fm, choices, option[0],option[1],option[2])
+    options.pack(side=LEFT)
+    button = Button(window0, text="Open", command=open_choice)
+    button.pack(side=TOP)
+
+    
+def open_choice():
+    global width,height,cellblock,title,author,cpyrt,notes,x,p,choice
+    window0.destroy()
+    if(choices.get()==option[0]):
+        createEntryWindow()
+        choice=option[0]
+    if(choices.get()==option[1]):
+        choice=option[1]
+        ftypes = [('Text files', '*.txt'), ('All files', '*')]
+        dlg = filedialog.Open(filetypes = ftypes)
+        ifil = dlg.show()
+        q=File()
+        q.loc=ifil
+        x=readtext(q)
+        title=x.title
+        author=x.author
+        cpyrt=x.cpyrt   
+        notes=x.notes
+        width=x.width
+        height=x.height
+        cellblock=x.solnblock
+        initUI()
+        
+    if(choices.get()==option[2]):
+        choice=option[2]
+        ftypes = [('Python files', '*.puz'), ('All files', '*')]
+        dlg = filedialog.Open(filetypes = ftypes)
+        ifil = dlg.show()
+        q=File()
+        q.loc=ifil
+        p=readpuz(q)
+        title=p.title
+        author=p.author
+        cpyrt=p.cpyrt   
+        notes=p.notes
+        width=p.width
+        height=p.height
+        cellblock=p.solnblock
+        initUI()
+
+    
 
 
 def highlightclue(c_row,c_col):
@@ -686,6 +749,27 @@ def textentered(event=0):
     create_rect(row,col)
 
     
+
+def save_sol_text():
+        file_opt=opt = {}
+        opt['filetypes'] = [('all files', '.*'), ('text files', '.txt')]
+        opt['parent'] = master
+        fileloc = filedialog.asksaveasfilename(**file_opt,defaultextension='.txt')
+        File.title=title
+        File.author=author
+        File.cpyrt=cpyrt
+        File.notes=notes
+        File.width=width
+        File.height=height
+        File.solnblock=cellblock
+        File.acc=acc
+        File.dwn=dwn
+        File.across=across
+        File.down=down
+        File.loc=fileloc
+        writetext(File)
+        messagebox.showinfo("", "Puzzle has been saved as text file successfully")
+
 def save_sol():
     global location
     location=StringVar()
@@ -712,11 +796,11 @@ def save_sol():
     if(check_dwn_clue==False):
         messagebox.showinfo("Sorry!", "Down cluelist has not been filled completely")
     if(check_block==True and check_acc_clue==True and check_dwn_clue==True):
-        file_opt=options = {}
-        options['filetypes'] = [('all files', '.*'), ('binary files', '.puz')]
+        file_opt=opt = {}
+        opt['filetypes'] = [('all files', '.*'), ('binary files', '.puz')]
         #options['initialfile'] = 'My_CW_File.puz'
-        options['parent'] = master
-        fileloc = filedialog.asksaveasfilename(**file_opt)
+        opt['parent'] = master
+        fileloc = filedialog.asksaveasfilename(**file_opt,defaultextension='.puz')
         File.title=title
         File.author=author
         File.cpyrt=cpyrt
@@ -735,8 +819,8 @@ def save_sol():
     
 # constructs the initial state for the crossword grid
 def initUI():
-    global master,MARGIN,SIDE,WIDTH,row,col,n,height,width,title,listbox,listbox1,first_row_col,canvas,is_multi,multi,across,down,row_cellno,col_cellno,cur_bool
-    global cellno,taglist,temp_str,temp_cellno,across_down,cur_clue,dull_clue,cur_clue_ad,dull_clue_ad,found_cur,found_dull,acc,dwn,filemenu,labelE,B,text
+    global master,MARGIN,SIDE,HEIGHT,WIDTH,row,col,n,height,width,title,listbox,listbox1,first_row_col,canvas,is_multi,multi,across,down,row_cellno,col_cellno,cur_bool
+    global cellno,taglist,temp_str,temp_cellno,across_down,cur_clue,dull_clue,cur_clue_ad,dull_clue_ad,found_cur,found_dull,acc,dwn,filemenu,labelE,B,text,x,ex0,ex1,ey0,ey1
     cur_bool=False
     master = Tk()
     master.title(title)
@@ -807,8 +891,23 @@ def initUI():
     # is_multi==1 is to input multiple entries in a cell, it can be turned off only after 'enter' key is pressed
     is_multi=0
     multi=[]
-
     count=1
+    num=0
+    if(choice!=option[0]):
+        ex0=[]
+        ex1=[]
+        ey1=[]
+        ey0=[]
+        for i in range(0,height):
+            ex0.append([])
+            ex1.append([])
+            ey0.append([])
+            ey1.append([])
+            for j in range(0,width):
+                ex0[i].append(0)
+                ex1[i].append(0)
+                ey0[i].append(0)
+                ey1[i].append(0)            
     # seperates across from down clues and finds cell no. associiated with each of these clues.
     for i in range(0,height):
         cellno.append([])
@@ -824,7 +923,11 @@ def initUI():
                     col_cellno.append(j)
                     across.append([])
                     across[acc].append(count)
-                    across[acc].append("")
+                    if(choice==option[2]):
+                        across[acc].append(str(p.across[num]))
+                        num=num+1
+                    else:
+                        across[acc].append("")
                     acc=acc+1
                     count=count+1
             if i<height-1 and cellblock[i+1][j]!=".":       
@@ -839,11 +942,23 @@ def initUI():
                         count=count+1
                         row_cellno.append(i)
                         col_cellno.append(j)
-                    down[dwn].append("")
+                    if(choice==option[2]):
+                        down[dwn].append(str(p.across[num]))
+                        num=num+1
+                    else:
+                        down[dwn].append("")
                     dwn=dwn+1
             j=i+1
         i=i+1
-    
+        
+    if(choice==option[1]):
+        for i in range(0,acc):
+            if(x.across[i]!=""):
+                across[i][1]=x.across[i]
+        for i in range(0,dwn):
+            if(x.down[i]!=""):
+                down[i][1]=x.down[i]
+            
     # creates grid
     for i in range(0,(width+1)):
         color="black"
@@ -899,7 +1014,12 @@ def initUI():
                     first_row_col=False
             if cellblock[i][j]==".":
                 canvas.create_rectangle(ex0[i][j], ey0[i][j], ex1[i][j], ey1[i][j],fill="black")
-                 
+            if cellblock[i][j]!="-" and cellblock[i][j]!=".":
+                    x=((ex0[i][j]+ex1[i][j])/2)+3
+                    y=((ey0[i][j]+ey1[i][j])/2)+3
+                    taglist.append(str(i)+","+str(j))
+                    temp_text=cellblock[i][j]                 
+                    canvas.create_text(x, y, text=temp_text, tag=(str(i)+","+str(j)), font=("Arial",16,"bold"), fill="black")
 
     # attaches scrollbars to across and down listboxes
     scrollbar = Scrollbar(canvas1)
@@ -907,7 +1027,10 @@ def initUI():
     listbox = Listbox(canvas1,selectbackground="gray",activestyle="none",selectforeground="red",exportselection=0,selectmode='SINGLE')
     listbox.pack(side=LEFT, fill=BOTH,expand=TRUE)
     for i in range(0,acc):
-        listbox.insert(END,("  "+str(across[i][0])+".  Across"))
+        if(choice!=option[0] and across[i][1]!=""):
+            listbox.insert(END,("  "+str(across[i][0])+".  "+across[i][1]))
+        else:
+            listbox.insert(END,("  "+str(across[i][0])+".  Across"))
         i=i+1
     listbox.config(yscrollcommand=scrollbar.set)
     scrollbar.config(command=listbox.yview)
@@ -916,7 +1039,10 @@ def initUI():
     listbox1 = Listbox(canvas2,selectbackground="gray",activestyle="none",selectforeground="red",exportselection=0,selectmode='SINGLE')
     listbox1.pack(side=LEFT, fill=BOTH,expand=TRUE)
     for i in range(0,dwn):
-        listbox1.insert(END,("  "+str(down[i][0])+".  Down"))
+        if(choice!=option[0] and down[i][1]!=""):
+            listbox1.insert(END,("  "+str(down[i][0])+".  "+down[i][1]))
+        else:
+            listbox1.insert(END,("  "+str(down[i][0])+".  Down"))
         i=i+1
     listbox1.config(yscrollcommand=scrollbar1.set)
     scrollbar1.config(command=listbox1.yview)
@@ -924,6 +1050,7 @@ def initUI():
     menubar = Menu(master)
     filemenu = Menu(menubar, tearoff=0)
     filemenu.add_command(label="Create Puzzle", command=save_sol)
+    filemenu.add_command(label="Save partially completed puzzle as text file", command=save_sol_text)
     filemenu.add_command(label="Multiple Entry", command=multiple_sol)
     filemenu.add_command(label="Clear Puzzle", command=clear_cells)
     menubar.add_cascade(label="File", menu=filemenu) 
@@ -960,4 +1087,5 @@ def initUI():
     canvas.focus_set()
     create_rect(row,col)
     master.mainloop()
-createEntryWindow()
+comboWindow()
+

@@ -22,7 +22,6 @@ def cib_cksum(cksum=0):
 
 # calculates checksum for the string section
 def text_cksum(cksum=0):
-    global cktrial
     if(f.title!=""):
         cksum = cksum_region(f.title.encode(Encoding_2)+b'\0',cksum)
     if(f.author!=""):

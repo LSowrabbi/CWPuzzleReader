@@ -146,8 +146,6 @@ def initUI0(cb,w,h):
     canvas.bind("<Button-1>", cell_clicked0)
     master.mainloop()
 
-
-
 def check():
     global width,height,cellblock,title,author,cpyrt,notes
     temp=True
@@ -270,8 +268,8 @@ def open_choice():
     global width,height,cellblock,title,author,cpyrt,notes,x,p,choice
     window0.destroy()
     if(choices.get()==option[0]):
-        createEntryWindow()
         choice=option[0]
+        createEntryWindow()
     if(choices.get()==option[1]):
         choice=option[1]
         ftypes = [('Text files', '*.txt'), ('All files', '*')]
@@ -288,7 +286,6 @@ def open_choice():
         height=x.height
         cellblock=x.solnblock
         initUI()
-        
     if(choices.get()==option[2]):
         choice=option[2]
         ftypes = [('Python files', '*.puz'), ('All files', '*')]
@@ -305,8 +302,6 @@ def open_choice():
         height=p.height
         cellblock=p.solnblock
         initUI()
-
-    
 
 
 def highlightclue(c_row,c_col):

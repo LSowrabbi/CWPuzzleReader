@@ -22,12 +22,12 @@ def cib_cksum(cksum=0):
 
 # calculates checksum for the string section
 def text_cksum(cksum=0):
+    global cktrial
     if(f.title!=""):
         cksum = cksum_region(f.title.encode(Encoding_2)+b'\0',cksum)
     if(f.author!=""):
         cksum = cksum_region(f.author.encode(Encoding_2)+b'\0',cksum)
     if(f.cpyrt!=""):
-
         cksum = cksum_region(copy_sym+f.cpyrt.encode(Encoding_2)+b'\0',cksum)
     for clue in cl:
         if(clue):
@@ -211,8 +211,3 @@ def filewrite(t):
             ofile.write(new_rtbl)
             ofile.write(b'\0')   
     ofile.close()
-
-
-
-
-

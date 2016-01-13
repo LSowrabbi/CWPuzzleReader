@@ -270,8 +270,8 @@ def open_choice():
     global width,height,cellblock,title,author,cpyrt,notes,x,p,choice
     window0.destroy()
     if(choices.get()==option[0]):
-        createEntryWindow()
         choice=option[0]
+        createEntryWindow()
     if(choices.get()==option[1]):
         choice=option[1]
         ftypes = [('Text files', '*.txt'), ('All files', '*')]

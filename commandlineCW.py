@@ -591,6 +591,66 @@ def unlock_soln():
     check_key(key)
 
 
+def save_txt():
+    getloc=ofile_txt.split("/")
+    st=getloc[len(getloc)-1]
+    op=ofile_txt.replace(st,"")
+    split1=st.split(".")
+    newst=""
+    for i in range(0,(len(split1)-1)):
+        newst=newst+split1[i]
+    op=op+newst+".txt"
+    col_space=[]
+    max_col=0
+    ofl=open(op,mode='wb')
+    ofl.write(("\n  ").encode(Encoding_2))
+    ofl.write(title)
+    for j in range (0,width):
+        for i in range (0,height):
+            if (len(cellblock[i][j])>max_col):
+                max_col=len(cellblock[i][j])
+        col_space.append(max_col)
+        max_col=0
+    ofl.write(("\n\n\n Current State of the puzzle:\n\n  ").encode(Encoding_2))
+
+    for i in range(0,height):
+        ofl.write(("\n  ").encode(Encoding_2))
+        ad_space=0
+        for j in range(0,width):
+            if(cellblock[i][j]!=":"):
+                ofl.write(cellblock[i][j].encode(Encoding_2))
+            else:
+                ofl.write(".".encode(Encoding_2))                    
+            ad_space=col_space[j]-len(cellblock[i][j])
+            if ad_space>0:
+                for k in range(0,ad_space):
+                    ofl.write((" ").encode(Encoding_2))                                          
+            ofl.write((" ").encode(Encoding_2))
+                
+    ofl.write(("\n\n CLUES\n").encode(Encoding_2))
+    ofl.write("\n Across :  \n".encode(Encoding_2)) 
+    calc_across()
+    calc_down()       
+    for i in range(0,acc):
+        ct=across[i][0]
+        r=row_cellno[ct-1]
+        c=col_cellno[ct-1]
+        temp=str(across[i][0])+". "+across[i][1]+" <"+across[i][3]+">"
+        ofl.write(("\n  ").encode(Encoding_2))
+        ofl.write(temp.encode(Encoding_2))
+            
+    ofl.write("\n\n Down :\n".encode(Encoding_2))    
+    for i in range(0,dwn):
+        ct=down[i][0]
+        r=row_cellno[ct-1]
+        c=col_cellno[ct-1]
+        temp=str(down[i][0])+". "+down[i][1]+" <"+down[i][3]+">"
+        ofl.write(("\n  ").encode(Encoding_2))
+        ofl.write(temp.encode(Encoding_2))
+    ofl.close()    
+
+
+
 
 # quits program if checksum does not match
 if(valid_cksum==False):
@@ -632,8 +692,13 @@ while(ip!=0):
             clear_cells()
             print('Cells Cleared!!')
         if(ip=="7"):
-            filewrite(1)
-            print("Saved Work Succesfully!")
+            choice=input(' 1 : Save as .puz file\n 2 : Copy work to a text file\n')
+            if choice=="1":
+                filewrite(1)
+                print("Saved Work Succesfully!")
+            if choice=="2":
+                save_txt()
+                print("Saved as text file succesfully!")                       
         if(ip=="8"):
             print('Current Block:')
             view_cur()
@@ -678,3 +743,8 @@ while(ip!=0):
         if(ip=="0"):
             print("Thank you!!")
             break
+
+
+
+
+

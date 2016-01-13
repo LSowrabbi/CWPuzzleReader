@@ -37,9 +37,10 @@ soln_state.append(0)
 
 def filewrite(nth_edit):
     global ifil,Encoding_1,Encoding_2,Encoding_3,soln_state,puztype,soln,curn_state,b,ifile,valid_cksum,check_reveal_state,unlock_state,notes_state,checksum_sol
-    global extra_sec_code,extra_sec_count,extra_sec_length,extra_sec_checksum,extra_sec_data,cluelist,ofile
+    global extra_sec_code,extra_sec_count,extra_sec_length,extra_sec_checksum,extra_sec_data,cluelist,ofile,ofile_txt
     global width,height,cellno,solnblock,across,down,acc,dwn,title,aut,cpyrt,notes,time,time_state
     if(nth_edit==0):
+        ofile_txt=ifil
         ifile = open(ifil,'rb')
         Encoding_1 = "ascii"
         Encoding_2 = "ISO-8859-1"

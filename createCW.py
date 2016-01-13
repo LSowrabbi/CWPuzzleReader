@@ -146,6 +146,8 @@ def initUI0(cb,w,h):
     canvas.bind("<Button-1>", cell_clicked0)
     master.mainloop()
 
+
+
 def check():
     global width,height,cellblock,title,author,cpyrt,notes
     temp=True
@@ -268,8 +270,8 @@ def open_choice():
     global width,height,cellblock,title,author,cpyrt,notes,x,p,choice
     window0.destroy()
     if(choices.get()==option[0]):
-        choice=option[0]
         createEntryWindow()
+        choice=option[0]
     if(choices.get()==option[1]):
         choice=option[1]
         ftypes = [('Text files', '*.txt'), ('All files', '*')]
@@ -286,6 +288,7 @@ def open_choice():
         height=x.height
         cellblock=x.solnblock
         initUI()
+        
     if(choices.get()==option[2]):
         choice=option[2]
         ftypes = [('Python files', '*.puz'), ('All files', '*')]
@@ -302,6 +305,8 @@ def open_choice():
         height=p.height
         cellblock=p.solnblock
         initUI()
+
+    
 
 
 def highlightclue(c_row,c_col):
@@ -723,6 +728,21 @@ def multiple_sol():
         listbox.config(state=DISABLED)
         listbox1.config(state=DISABLED)
 
+# finds current state of an across or down word, taking the starting row and column for that word as the input
+def findcurracross(i,j):
+    curstr=""
+    while((j<width) and  (cellblock[i][j]!="." and cellblock[i][j]!=":")):
+        curstr=curstr+cellblock[i][j]
+        j=j+1
+    return curstr
+
+def findcurrdown(i,j):
+    curstr=""
+    while((i<height) and (cellblock[i][j]!="." and cellblock[i][j]!=":")):
+        curstr=curstr+cellblock[i][j]
+        i=i+1
+    return curstr
+    
 def textentered(event=0):
     ip=text.get("1.0",'end-1c')
     if(cur_bool==True and ip!=""):
@@ -811,7 +831,67 @@ def save_sol():
         filewrite(File)
         master.destroy()
         sys.exit(0)
-    
+
+def save_txt():
+    file_opt=opt = {}
+    col_space=[]
+    max_col=0
+    Encoding_2 = "ISO-8859-1"
+    opt['filetypes'] = [('all files', '.*'), ('text files', '.txt')]
+    opt['parent'] = master
+    fileloc = filedialog.asksaveasfilename(**file_opt,defaultextension='.txt')
+    ofil=fileloc
+    ofl=open(ofil,mode='wb')
+    ofl.write(("\n  ").encode(Encoding_2))
+    ofl.write(title.encode(Encoding_2))    
+    for j in range (0,width):
+        for i in range (0,height):
+            if (len(cellblock[i][j])>max_col):
+                max_col=len(cellblock[i][j])
+        col_space.append(max_col)
+        max_col=0
+    ofl.write(("\n\n\n Current State of the puzzle:\n\n  ").encode(Encoding_2))        
+    for i in range(0,height):
+        ofl.write(("\n  ").encode(Encoding_2))
+        ad_space=0
+        for j in range(0,width):
+            if(cellblock[i][j]!=":"):
+                ofl.write(cellblock[i][j].encode(Encoding_2))
+            else:
+                ofl.write(".".encode(Encoding_2))                    
+            ad_space=col_space[j]-len(cellblock[i][j])
+            if ad_space>0:
+                for k in range(0,ad_space):
+                    ofl.write((" ").encode(Encoding_2))                                          
+            ofl.write((" ").encode(Encoding_2))                
+    ofl.write(("\n\n CLUES\n").encode(Encoding_2))
+    ofl.write("\n Across :  \n".encode(Encoding_2))        
+    for i in range(0,acc):
+        ct=across[i][0]
+        r=row_cellno[ct-1]
+        c=col_cellno[ct-1]
+        temp_st=findcurracross(r,c)
+        if(across[i][1]!=""):
+            temp=str(across[i][0])+". "+across[i][1]+" <"+temp_st+">"
+        else:
+            temp=str(across[i][0])+". Across <"+temp_st+">"            
+        ofl.write(("\n  ").encode(Encoding_2))
+        ofl.write(temp.encode(Encoding_2))
+            
+    ofl.write("\n\n Down :\n".encode(Encoding_2))    
+    for i in range(0,dwn):
+        ct=down[i][0]
+        r=row_cellno[ct-1]
+        c=col_cellno[ct-1]
+        temp_st=findcurrdown(r,c)
+        ofl.write(("\n  ").encode(Encoding_2))
+        if(down[i][1]!=""):
+            temp=str(down[i][0])+". "+down[i][1]+" <"+temp_st+">"
+        else:
+            temp=str(down[i][0])+". Down <"+temp_st+">" 
+        ofl.write(temp.encode(Encoding_2))
+    ofl.close()
+        
 # constructs the initial state for the crossword grid
 def initUI():
     global master,MARGIN,SIDE,HEIGHT,WIDTH,row,col,n,height,width,title,listbox,listbox1,first_row_col,canvas,is_multi,multi,across,down,row_cellno,col_cellno,cur_bool
@@ -1045,7 +1125,8 @@ def initUI():
     menubar = Menu(master)
     filemenu = Menu(menubar, tearoff=0)
     filemenu.add_command(label="Create Puzzle", command=save_sol)
-    filemenu.add_command(label="Save partially completed puzzle as text file", command=save_sol_text)
+    filemenu.add_command(label="Save partially completed puzzle as text file", command=save_sol_text)   
+    filemenu.add_command(label="Copy work to a text file", command=save_txt)
     filemenu.add_command(label="Multiple Entry", command=multiple_sol)
     filemenu.add_command(label="Clear Puzzle", command=clear_cells)
     menubar.add_cascade(label="File", menu=filemenu) 

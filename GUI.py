@@ -78,6 +78,21 @@ found_dull=0
 is_multi=0
 multi=[]
 class UI():
+    # finds current state of an across or down word, taking the starting row and column for that word as the input
+    def findcurracross(i,j):
+        curstr=""
+        while((j<width) and  (cellblock[i][j]!="." and cellblock[i][j]!=":")):
+            curstr=curstr+cellblock[i][j]
+            j=j+1
+        return curstr
+
+    def findcurrdown(i,j):
+        curstr=""
+        while((i<height) and (cellblock[i][j]!="." and cellblock[i][j]!=":")):
+            curstr=curstr+cellblock[i][j]
+            i=i+1
+        return curstr
+    
     # creates temporary text for highlighted cells
     def create_txt(row,col):
         global temp_str
@@ -330,6 +345,7 @@ class UI():
         UI.filemenu.entryconfig(1,state=c_state)
         UI.filemenu.entryconfig(2,state=c_state)            
         UI.filemenu.entryconfig(3,state=c_state) 
+        UI.filemenu.entryconfig(4,state=c_state) 
         UI.viewmenu.entryconfig(0,state=c_state)
         return
                     
@@ -907,6 +923,62 @@ class UI():
         filewrite(1,sec,time_state)
         messagebox.showinfo("", "saved successfully")
         
+    def save_txt():
+        file_opt=opt = {}
+        col_space=[]
+        max_col=0
+        opt['filetypes'] = [('all files', '.*'), ('text files', '.txt')]
+        opt['parent'] = master
+        fileloc = filedialog.asksaveasfilename(**file_opt,defaultextension='.txt')
+        ofil=fileloc
+        ofl=open(ofil,mode='wb')
+        ofl.write(("\n  ").encode(Encoding_2))
+        ofl.write(title)       
+        for j in range (0,width):
+            for i in range (0,height):
+                if (len(cellblock[i][j])>max_col):
+                    max_col=len(cellblock[i][j])
+            col_space.append(max_col)
+            max_col=0
+        ofl.write(("\n\n\n Current State of the puzzle:\n\n  ").encode(Encoding_2))
+        
+        for i in range(0,height):
+            ofl.write(("\n  ").encode(Encoding_2))
+            ad_space=0
+            for j in range(0,width):
+                if(cellblock[i][j]!=":"):
+                    ofl.write(cellblock[i][j].encode(Encoding_2))
+                else:
+                    ofl.write(".".encode(Encoding_2))                    
+                ad_space=col_space[j]-len(cellblock[i][j])
+                if ad_space>0:
+                    for k in range(0,ad_space):
+                        ofl.write((" ").encode(Encoding_2))                                          
+                ofl.write((" ").encode(Encoding_2))
+                
+        ofl.write(("\n\n CLUES\n").encode(Encoding_2))
+        ofl.write("\n Across :  \n".encode(Encoding_2))        
+        for i in range(0,acc):
+            ct=across[i][0]
+            r=row_cellno[ct-1]
+            c=col_cellno[ct-1]
+            temp_st=UI.findcurracross(r,c)
+            temp=str(across[i][0])+". "+across[i][1]+" <"+temp_st+">"
+            ofl.write(("\n  ").encode(Encoding_2))
+            ofl.write(temp.encode(Encoding_2))
+            
+        ofl.write("\n\n Down :\n".encode(Encoding_2))    
+        for i in range(0,dwn):
+            ct=down[i][0]
+            r=row_cellno[ct-1]
+            c=col_cellno[ct-1]
+            temp_st=UI.findcurrdown(r,c)
+            ofl.write(("\n  ").encode(Encoding_2))
+            temp=str(down[i][0])+". "+down[i][1]+" <"+temp_st+">"
+            ofl.write(temp.encode(Encoding_2))
+        ofl.close()
+
+
     def check_key():
         global check_reveal_state,unlock_state,soln_state,checksum_sol
         ab=unscramble_solution(soln.decode(Encoding_2), width, height, int(key.get()))
@@ -963,6 +1035,7 @@ class UI():
     menubar = Menu(master)
     filemenu = Menu(menubar, tearoff=0)
     filemenu.add_command(label="Save", command=save_sol)
+    filemenu.add_command(label="Save as Text File", command=save_txt)
     filemenu.add_command(label="Clear Puzzle", command=clear_cells)
     filemenu.add_command(label="Multiple Entry", command=multiple_sol)
     filemenu.add_checkbutton(label="Use Pencil", variable = is_pencil, onvalue = 1, offvalue = 0)
@@ -1022,12 +1095,12 @@ class UI():
     listbox1.bind("<<ListboxSelect>>", box_clickedD)
     canvas.bind("<Button-1>", cell_clicked)
     master.bind("<Key>", key_pressed)
-    canvas.bind("<Left>", key_pressedL)
-    canvas.bind("<Right>", key_pressedR)
-    canvas.bind("<Up>", key_pressedU)
-    canvas.bind("<BackSpace>",key_pressedB)
-    canvas.bind("<Return>",key_pressedE)
-    canvas.bind("<Down>",key_pressedD)
+    master.bind("<Left>", key_pressedL)
+    master.bind("<Right>", key_pressedR)
+    master.bind("<Up>", key_pressedU)
+    master.bind("<BackSpace>",key_pressedB)
+    master.bind("<Return>",key_pressedE)
+    master.bind("<Down>",key_pressedD)
     row,col=0,0
 
 

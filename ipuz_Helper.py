@@ -5,6 +5,12 @@ import operator
 import math
 import string
 Encoding_2 = "ISO-8859-1" 
+def iso_conv(data_s):
+    temp_s=data_s.replace("\u201c","\"")
+    temp_s=temp_s.replace("\u201d","\"")
+    temp_s=temp_s.replace("\u2018","\'")
+    temp_s=temp_s.replace("\u2019","\'")
+    return temp_s
 # finds the checksum for the data given as argument
 def cksum_region(data, cksum=0):
     for c in data:
@@ -24,16 +30,20 @@ def cib_cksum(cksum=0):
 def text_cksum(cksum=0):
     global cktrial
     if(f.title!=""):
-        cksum = cksum_region(f.title.encode(Encoding_2)+b'\0',cksum)
+        temp_s=iso_conv(f.title)
+        cksum = cksum_region(temp_s.encode(Encoding_2)+b'\0',cksum)
     if(f.author!=""):
-        cksum = cksum_region(f.author.encode(Encoding_2)+b'\0',cksum)
+        temp_s=iso_conv(f.author)
+        cksum = cksum_region(temp_s.encode(Encoding_2)+b'\0',cksum)
     if(f.cpyrt!=""):
-        cksum = cksum_region(copy_sym+f.cpyrt.encode(Encoding_2)+b'\0',cksum)
+        temp_s=iso_conv(f.cpyrt)
+        cksum = cksum_region(temp_s.encode(Encoding_2)+b'\0',cksum)
     for clue in cl:
         if(clue):
             cksum = cksum_region(clue, cksum) 
     if(f.notes!=""):
-        cksum = cksum_region(f.notes.encode(Encoding_2)+b'\0',cksum)
+        temp_s=iso_conv(f.notes)
+        cksum = cksum_region(temp_s.encode(Encoding_2)+b'\0',cksum)
     return cksum
     
 
@@ -102,22 +112,26 @@ def filewrite(t):
     cluelist=('').encode(Encoding_2)
     while(temp_acc!=f.acc and temp_dwn!=f.dwn):
         if(f.across[temp_acc][0]<=f.down[temp_dwn][0]):
-            cl.append(f.across[temp_acc][1].encode(Encoding_2))
-            cluelist=cluelist+(f.across[temp_acc][1].encode(Encoding_2))+b'\0'               
+            temp_s=iso_conv(f.across[temp_acc][1])
+            cl.append(temp_s.encode(Encoding_2))
+            cluelist=cluelist+(temp_s.encode(Encoding_2))+b'\0'               
             temp_acc=temp_acc+1
         else:
-            cl.append(f.down[temp_dwn][1].encode(Encoding_2))
-            cluelist=cluelist+(f.down[temp_dwn][1].encode(Encoding_2))+b'\0'
+            temp_s=iso_conv(f.down[temp_dwn][1])
+            cl.append(temp_s.encode(Encoding_2))
+            cluelist=cluelist+(temp_s.encode(Encoding_2))+b'\0'
             temp_dwn=temp_dwn+1
     if(temp_acc==f.acc  and temp_dwn!=f.dwn):
         while(temp_dwn!=f.dwn):
-            cl.append(f.down[temp_dwn][1].encode(Encoding_2))
-            cluelist=cluelist+(f.down[temp_dwn][1].encode(Encoding_2))+b'\0'
+            temp_s=iso_conv(f.down[temp_dwn][1])
+            cl.append(temp_s.encode(Encoding_2))
+            cluelist=cluelist+(temp_s.encode(Encoding_2))+b'\0'
             temp_dwn=temp_dwn+1                
     if(temp_acc!=f.acc and temp_dwn==f.dwn):
         while(temp_acc!=f.acc):
-            cl.append(f.across[temp_acc][1].encode(Encoding_2))
-            cluelist=cluelist+(f.across[temp_acc][1].encode(Encoding_2))+b'\0'
+            temp_s=iso_conv(f.across[temp_acc][1])
+            cl.append(temp_s.encode(Encoding_2))
+            cluelist=cluelist+(temp_s.encode(Encoding_2))+b'\0'
             temp_acc=temp_acc+1
     if(rebus_usr_entry==True):
         count=1
@@ -185,16 +199,19 @@ def filewrite(t):
     ofile.write(new_soln)
     ofile.write(new_curn)
     # string section
-    ofile.write((f.title).encode(Encoding_2))
+    temp_s=iso_conv(f.title)
+    ofile.write((temp_s).encode(Encoding_2))
     ofile.write(b'\0')
-    ofile.write((f.author).encode(Encoding_2))
+    temp_s=iso_conv(f.author)
+    ofile.write((temp_s).encode(Encoding_2))
     ofile.write(b'\0')
-    ofile.write(copy_sym)
-    ofile.write((f.cpyrt).encode(Encoding_2))
+    temp_s=iso_conv(f.cpyrt)
+    ofile.write((temp_s).encode(Encoding_2))
     ofile.write(b'\0')
     ofile.write(cluelist)
     if(f.notes!=""):
-        ofile.write((f.notes).encode(Encoding_2))
+        temp_s=iso_conv(f.notes)
+        ofile.write((temp_s).encode(Encoding_2))
     ofile.write(b'\0')
     if(rebus_usr_entry==True):
             new_length=len(new_grbs)
@@ -212,8 +229,3 @@ def filewrite(t):
             ofile.write(new_rtbl)
             ofile.write(b'\0')   
     ofile.close()
-
-
-
-
-

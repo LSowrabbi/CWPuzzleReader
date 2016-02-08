@@ -4,19 +4,15 @@ import json
 import sys
 from tkinter import *
 from tkinter.messagebox import *
-title="title"
-author="author"
-cpyrt="copyright"
-notes="Notes"
 unlock_state="disabled"
 notes_state="disabled"
 is_puz_rebus=False
 Encoding_2 = "ISO-8859-1" 
 class File():
-    title="title"
-    author="author"
-    cpyrt="copyright"
-    notes="Notes"
+    title=None
+    author=None
+    cpyrt=None
+    notes=None
     width=0
     height=0
     solnblock=[]
@@ -43,7 +39,6 @@ valid=[]
 gext=[]
 time=0
 time_state=0
-
 root = Tk()
 root.withdraw()
 root.update()
@@ -75,6 +70,22 @@ if 'empty' in puzzle:
         pass  
 else:
     empty=0
+if 'title' in puzzle:
+    title=puzzle['title']
+else:
+    title='title'        
+if 'author' in puzzle:
+    author=puzzle['author']
+else:
+    author='author'
+if 'copyright' in puzzle:
+    cpyrt=puzzle['copyright']
+else:
+    cpyrt='copyright'
+if 'notes' in puzzle:
+    notes=puzzle['notes']
+else:
+    notes=''
 if 'Across' in puzzle['clues'] and 'Down' in puzzle['clues']:      
     for i in range(0,len(puzzle['clues']['Across'])):
         l=puzzle['clues']['Across'][i]
@@ -1315,3 +1326,6 @@ class UI():
 UI.create_rect(row,col)
 UI.update_clock()
 master.mainloop()
+
+
+

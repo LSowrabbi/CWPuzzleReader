@@ -1,0 +1,753 @@
+import ipuz
+import ipuz_Helper
+import json
+import sys
+from tkinter import *
+from tkinter.messagebox import *
+master = Tk()
+# is_multi==1 is to input multiple entries in a cell, it can be turned off only after 'enter' key is pressed
+is_multi=0
+multi=[]
+across=[]
+down=[]
+cellblock=[]
+solnblock=[]
+row_cellno=[]
+col_cellno=[]
+cellno=[]
+class File():
+    title=None
+    author=None
+    cpyrt=None
+    notes=None
+    width=0
+    height=0
+    solnblock=[]
+    cellblock=[]
+    acc=0
+    dwn=0
+    across=[]
+    down=[]
+    loc=""
+    
+with open('/Users/arunprakashlakshminarayanan/Downloads/ipuz2.ipuz') as data_file:    
+    data = data_file.read()
+try:
+    puzzle = ipuz.read(data)
+    print("True")
+except ipuz.IPUZException:
+    print("invalid puzzle")
+    sys.exit(0)
+#puzzle['dimensions']['width']=5
+#d2 = {2: 'ha!', 3: 3}
+#puzzle.update(d2)
+if 'block' in puzzle:
+    block=puzzle['block']
+else:
+    block="#"
+if 'empty' in puzzle:
+    empty=puzzle['empty']
+    try:
+        empty=int(empty)
+    except ValueError:
+        pass  
+else:
+    empty=0
+if 'Across' in puzzle['clues'] and 'Down' in puzzle['clues']:      
+    for i in range(0,len(puzzle['clues']['Across'])):
+        l=puzzle['clues']['Across'][i]
+        across.append([])
+        if isinstance(l,dict):
+            across[i].append(l['number'])
+            across[i].append(l['clue'])
+        else:
+            across[i].append(l[0])
+            across[i].append(l[1])
+    acc=len(across)
+    for i in range(0,len(puzzle['clues']['Down'])):
+        l=puzzle['clues']['Down'][i]
+        down.append([])
+        if isinstance(l,dict): 
+            down[i].append(l['number'])
+            down[i].append(l['clue'])
+        else:
+            down[i].append(l[0])
+            down[i].append(l[1])
+    dwn=len(down)
+if isinstance(puzzle['dimensions']['height'],str):
+    height=int(puzzle['dimensions']['height'])
+else:
+    height=puzzle['dimensions']['height']
+if isinstance(puzzle['dimensions']['width'],str):
+    width=int(puzzle['dimensions']['width'])
+else:
+    width=puzzle['dimensions']['width']
+for i in range(0,height):
+    cellblock.append([])
+    cellno.append([])
+    solnblock.append([])
+    for j in range(0,width):
+        if isinstance(puzzle['puzzle'][i][j],dict):
+            cellblock[i].append(puzzle['puzzle'][i][j]['cell'])
+        else:
+            cellblock[i].append(puzzle['puzzle'][i][j])
+        if cellblock[i][j]!=block and cellblock[i][j]!=empty and cellblock[i][j]!="null":
+            row_cellno.append(i)
+            col_cellno.append(j)
+            cellno[i].append(cellblock[i][j])
+        else:
+            cellno[i].append(0)            
+        if cellblock[i][j]==block or cellblock[i][j]=="null":
+            cellblock[i][j]="."
+            solnblock[i].append(".")
+        else:
+            if 'saved' in puzzle:
+                if isinstance(puzzle['saved'][i][j],dict):
+                    cellblock[i][j]=puzzle['saved'][i][j]['value']
+                else:
+                    cellblock[i][j]=puzzle['saved'][i][j]
+                if cellblock[i][j]==empty:
+                    cellblock[i][j]="-"
+            else:
+                cellblock[i][j]="-"
+            if 'solution' in puzzle:
+                if isinstance(puzzle['solution'][i][j],dict):
+                    solnblock[i].append(puzzle['solution'][i][j]['value'])
+                else:
+                    solnblock[i].append(puzzle['solution'][i][j])
+            else:
+                solnblock[i].append("A")
+            
+            
+MARGIN=10
+screen_width = master.winfo_screenwidth()
+screen_height = master.winfo_screenheight()
+sw=int(screen_width/6)-30
+HEIGHT=screen_height-200
+SIDE=(HEIGHT - (MARGIN*2))/height
+WIDTH=MARGIN*2+SIDE*width
+row,col,n=0,0,0
+listbox_width=screen_width-(WIDTH+30)
+fmB1=Frame(master,height=20)
+fmB1.pack(side=TOP, anchor=NW, fill=BOTH,expand=TRUE)
+fm2=Frame(master,width=WIDTH+30,height=HEIGHT+30,bg="#D9DADA")
+fm2.pack(side=LEFT, anchor=NW, fill=Y)
+# canvas for the crossword grid
+canvas= Canvas(fm2,width=WIDTH,height=HEIGHT,scrollregion=(0,0,WIDTH,HEIGHT),relief=RAISED,bg="white")
+canvas.config(highlightbackground="#D9DADA",highlightcolor="#D9DADA")
+canvas.create_rectangle(0, 0, WIDTH, 10,fill="#D9DADA",width=0)
+canvas.create_rectangle(0, 0, 10, HEIGHT,fill="#D9DADA",width=0)
+canvas.create_rectangle((WIDTH-MARGIN),0, WIDTH, HEIGHT,fill="#D9DADA",width=0)
+canvas.create_rectangle(0,(HEIGHT-MARGIN), WIDTH, HEIGHT,fill="#D9DADA",width=0)
+canvas.pack(side=LEFT)
+fm1=Frame(master,width=listbox_width,height=HEIGHT,relief=FLAT,bg="#D9DADA")
+fm1.pack(side=LEFT, anchor=NW, fill=BOTH,expand=TRUE)
+fmS=Frame(fm1,width=30,height=HEIGHT,bg="#D9DADA")
+fmS.pack(side=LEFT,anchor=NW)
+fm3=Frame(fm1,height=10,relief=FLAT,bg="#D9DADA")
+fm3.pack(side=TOP,anchor=NW, fill=Y)
+# Across clue list
+label = Label( fm1,text="Across",relief=GROOVE,font=("Arial",17), anchor=NW,bg="#F2F2F2") 
+label.pack(side=TOP,anchor=NW,fill=X)
+canvas1= Canvas(fm1,height=(HEIGHT-10)/2,relief=FLAT,bg="#D9DADA")
+canvas1.pack(side=TOP,anchor=NW, fill=BOTH,expand=TRUE)
+fmS1= Frame(fm1,width=10,height=10,relief=FLAT,bd=0,bg="#D9DADA")
+fmS1.pack(side=TOP,anchor=NW)
+# Down clue list
+labelD = Label(fm1,relief=GROOVE,text="Down", font=("Arial",17), anchor=NW,bg="#D9DADA")
+labelD.pack(side=TOP,anchor=NW,fill=X)
+canvas2= Canvas(fm1,height=(HEIGHT-10)/2,relief=FLAT,bg="#D9DADA")
+canvas2.pack(side=TOP,anchor=NW, fill=BOTH,expand=TRUE)
+elements=[]
+ex0=[]
+ey0=[]
+ex1=[]
+ey1=[]
+taglist=[]
+temp_str=[]
+temp_cellno=[]
+temp_circ=[]
+temp_valid=[]
+prevx0,prevy0,prevx1,prevy1=0,0,0,0
+first_row_col=True
+across_down="across"
+a=0
+cur_clue=0
+dull_clue=0
+cur_clue_ad="across"
+dull_clue_ad="down"
+found_cur=0
+found_dull=0
+cells=height
+
+def initUI():
+    global row,col,n,cells,width,title,Encoding_2,listbox,listbox1,first_row_col,is_pencil,cur_clue_ad,dull_clue_ad
+    # creates grid
+    for i in range(0,(width+1)):
+        color="black"
+        x0 = MARGIN + i * SIDE
+        y0 = MARGIN
+        x1 = MARGIN + i * SIDE
+        y1 = HEIGHT - MARGIN
+        canvas.create_line(x0, y0, x1, y1, fill=color)
+    for i in range(0,(cells+1)):
+        x0 = MARGIN
+        y0 = MARGIN + i * SIDE
+        x1 = WIDTH - MARGIN
+        y1 = MARGIN + i * SIDE
+        canvas.create_line(x0, y0, x1, y1, fill=color)
+        # x0,y0,x1 and y1 position for each cell in the canvas
+    for row in range(height):
+        c=0
+        ex0.append([])
+        ex1.append([])
+        ey0.append([])
+        ey1.append([])
+        for col in range (width):
+            if(row==0):
+                len1=MARGIN+(col*SIDE)
+                ex0[row].append(len1)
+                ey0[row].append(MARGIN)
+                len2=MARGIN+((col+1)*SIDE)
+                ex1[row].append(len2)
+                ey1[row].append(MARGIN+SIDE)
+            else:
+                ex0[row].append(ex0[(row-1)][col])
+                ey0[row].append(ey0[(row-1)][col]+SIDE)
+                ex1[row].append(ex1[(row-1)][col])
+                ey1[row].append(ey1[(row-1)][col]+SIDE)
+    x0=ex1[0][(width-1)]
+    y0=ey0[0][(width-1)]
+    x1=ex1[(cells-1)][(width-1)]
+    y1=ey1[(cells-1)][(width-1)]
+    canvas.create_line(x0, y0, x1, y1, fill=color)
+    for i in range(0,cells):
+        for j in range(0,width):
+            x=ex0[i][j]+5
+            y=ey0[i][j]+5
+            if(cellno[i][j]!=0):
+                canvas.create_text(x, y, text=str(cellno[i][j]), font=("Times New Roman",9), fill="black")
+                if(first_row_col):
+                    row=i
+                    col=j
+                    if((j+1<width) and cellblock[i][j+1]!="." and cellblock[i][j+1]!=":"):
+                        across_down="across"
+                        cur_clue_ad="across"
+                        dull_clue_ad="down"
+                    else:
+                        across_down="down"
+                        cur_clue_ad="down"
+                        dull_clue_ad="across"
+                    first_row_col=False
+            if cellblock[i][j]=='.' or cellblock[i][j]==":":
+                canvas.create_rectangle(ex0[i][j], ey0[i][j], ex1[i][j], ey1[i][j],fill="black")                    
+            x=((ex0[i][j]+ex1[i][j])/2)+3
+            y=((ey0[i][j]+ey1[i][j])/2)+3
+            if cellblock[i][j]!="-" and (cellblock[i][j]!="." and cellblock[i][j]!=":"):
+                taglist.append(str(i)+","+str(j))
+                temp_text=cellblock[i][j]
+                # rebus cells
+                if(len(temp_text)>2):
+                    temp_text=temp_text[0:2]+".."
+                    canvas.create_text(x, y, text=temp_text, tag=(str(i)+","+str(j)), font=("Arial",16,"bold"), fill="black")                           
+    # attaches scrollbars to across and down listboxes
+    scrollbar = Scrollbar(canvas1)
+    scrollbar.pack(side=RIGHT, fill=Y)
+    listbox = Listbox(canvas1,selectbackground="gray",activestyle="none",selectforeground="red",exportselection=0,selectmode='SINGLE')
+    listbox.pack(side=LEFT, fill=BOTH,expand=TRUE)
+    for i in range(0,acc):
+        listbox.insert(END,("  "+str(across[i][0])+".  "+str(across[i][1])))
+        i=i+1
+    listbox.config(yscrollcommand=scrollbar.set)
+    scrollbar.config(command=listbox.yview)
+    scrollbar1 = Scrollbar(canvas2)
+    scrollbar1.pack(side=RIGHT, fill=Y)
+    listbox1 = Listbox(canvas2,selectbackground="gray",activestyle="none",selectforeground="red",exportselection=0,selectmode='SINGLE')
+    listbox1.pack(side=LEFT, fill=BOTH,expand=TRUE)
+    for i in range(0,dwn):
+        listbox1.insert(END,("  "+str(down[i][0])+".  "+str(down[i][1])))
+        i=i+1
+    listbox1.config(yscrollcommand=scrollbar1.set)
+    scrollbar1.config(command=listbox1.yview)
+
+# finds current state of an across or down word, taking the starting row and column for that word as the input
+def findcurracross(i,j):
+    curstr=""
+    while((j<width) and  (cellblock[i][j]!="." and cellblock[i][j]!=":")):
+        curstr=curstr+cellblock[i][j]
+        j=j+1
+    return curstr
+
+def findcurrdown(i,j):
+    curstr=""
+    while((i<height) and (cellblock[i][j]!="." and cellblock[i][j]!=":")):
+        curstr=curstr+cellblock[i][j]
+        i=i+1
+    return curstr
+
+# creates temporary text for highlighted cells
+def create_txt(row,col):
+    global temp_str
+    if cellblock[row][col]!="-" and (cellblock[row][col]!="." and cellblock[row][col]!=":"):
+        if str(row)+","+str(col) in taglist:
+            x=(ex0[row][col]+ex1[row][col])/2+3
+            y=(ey0[row][col]+ey1[row][col])/2+3
+            temp_str.append("temp_str"+str(row)+","+str(col))
+            temp_text=cellblock[row][col]
+            if(len(temp_text)==1):
+                size=16
+            else:
+                size=10
+            # checks for rebus
+            if(len(temp_text)>2):
+                temp_text=temp_text[0:2]+".."
+            canvas.create_text(x, y, text=temp_text,font=("Arial",size,"bold"), tag=("temp_str"+str(row)+","+str(col)), fill="black" )
+
+# creates temporary cellno,if any, for highlighted cells
+def create_cellno(row,col):
+    global temp_cellno
+    if(cellno[row][col]!=0):
+        x=ex0[row][col]+5
+        y=ey0[row][col]+5
+        temp_cellno.append(("temp_cell"+str(row)+","+str(col)))
+        canvas.create_text(x, y, text=str(cellno[row][col]),tag=("temp_cell"+str(row)+","+str(col)),font=("Times New Roman",9), fill="black")
+            
+def highlightclue(c_row,c_col):
+    # if across_down = "Across" then dull clue = down and cur_clue = across, else vice versa
+    d_col=c_col
+    disp_clue=""
+    global dull_clue,cur_clue,dull_clue_ad,cur_clue_ad,cur_bool
+    # clears previous dull and current clues
+    cur_bool=True
+    if(dull_clue_ad=="across"):
+        if(acc!=0):
+            listbox.selection_clear(dull_clue)
+    else:
+        if(dwn!=0):
+            listbox1.selection_clear(dull_clue)
+    if(cur_clue_ad=="across"):
+        if(acc!=0):
+            listbox.selection_clear(cur_clue)
+    else:
+        if(dwn!=0):
+            listbox1.selection_clear(cur_clue)
+    # reconfigures the foreground color of dull clues to red
+    if(dull_clue_ad=="across"):
+        if(acc!=0):
+            listbox.itemconfig(dull_clue,selectbackground="gray",selectforeground="red")
+    else:
+        if(dwn!=0):
+            listbox1.itemconfig(dull_clue,selectbackground="gray",selectforeground="red")
+    if across_down=="across":
+        cur_clue_ad="across"
+        dull_clue_ad="down"
+    else:
+        cur_clue_ad="down"
+        dull_clue_ad="across"
+    # finds new dull and current clues
+    while(c_col!=0 and cellblock[c_row][c_col]!='.'):
+        c_col=c_col-1
+    if(cellblock[c_row][c_col]=='.'):
+        c_col=c_col+1
+    for i in range(0,acc+1):
+        if(i!=acc):
+            if(cellno[c_row][c_col]==across[i][0]):
+                if across_down=="across":
+                    cur_clue=i
+                else:
+                    dull_clue=i
+                break
+    if i==acc:
+        if across_down=="across":
+            cur_bool=False
+            cur_clue=0
+        else:
+            dull_clue=0
+    while(c_row!=0 and cellblock[c_row][d_col]!='.'):
+        c_row=c_row-1
+    if(cellblock[c_row][d_col]=='.'):
+        c_row=c_row+1
+    for i in range(0,dwn+1):
+        if(i!=dwn):
+            if(cellno[c_row][d_col]==down[i][0]):
+                if across_down=="down":
+                    cur_clue=i
+                else:
+                    dull_clue=i
+                break
+    if i==dwn:
+        if across_down=="down":
+            cur_bool=False
+            cur_clue=0
+        else:
+            dull_clue=0
+    # highlights dull and current clues and reconfigures foreground color of dull clue
+    if(cur_clue_ad=="across"):
+        if(acc!=0):
+            listbox.selection_set(first=cur_clue)
+            disp_clue=across[cur_clue][1]
+            listbox.see(cur_clue)
+    else:
+        if(dwn!=0):
+            listbox1.selection_set(first=cur_clue)
+            disp_clue=down[cur_clue][1]
+            listbox1.see(cur_clue)
+    if(dull_clue_ad=="across"):
+        if(acc!=0):
+            listbox.itemconfig(dull_clue,selectbackground="gray",selectforeground="black")
+            listbox.selection_set(first=dull_clue)
+            listbox.see(dull_clue)
+    else:
+        if(dwn!=0):
+            listbox1.itemconfig(dull_clue,selectbackground="gray",selectforeground="black")
+            listbox1.selection_set(first=dull_clue)
+            listbox1.see(dull_clue)
+    labelc.config(text=disp_clue)
+
+def create_rect(c_row,c_col):
+    # highlights word corresponding to the currently active row and col
+    global temp_str,taglist
+    # deletes previously highlighted circles,cell nos,entries showing validity and texts.
+    canvas.delete("cursor")
+    for element in temp_str:
+        canvas.delete(element)
+    del temp_str[:]
+    for element in temp_cellno:
+        canvas.delete(element)
+    del temp_cellno[:]
+    for element in temp_circ:
+        canvas.delete(element)
+    del temp_circ[:]
+    for element in temp_valid:
+        canvas.delete(element)
+    del temp_valid[:]
+    # highlights cell of the clicked letter to red
+    if cellblock[c_row][c_col]!="." and cellblock[c_row][c_col]!=":":
+        canvas.create_rectangle(ex0[c_row][c_col],ey0[c_row][c_col], ex1[c_row][c_col], ey1[c_row][c_col],fill="red", tags=("cursor"))
+        highlightclue(c_row,c_col)
+        # creates temporary entries for the highlighted cell
+        create_txt(c_row,c_col)      
+        if(cellno[c_row][c_col]!=0):
+            create_cellno(c_row,c_col)
+            #if(gext[c_row][c_col] in [5,9,10,11,12,13,14,15]):
+               #UI.create_cir(c_row,c_col)
+            #if(valid[c_row][c_col]!=0):
+               #UI.create_pol(c_row,c_col,valid[c_row][c_col])
+        row=c_row
+        col=c_col
+        # highlights and creates temporary entires for the cells to the left/up, that form the word along with the letter in the highlighted cell
+        if (across_down=="down"):
+            row=c_row-1
+        else:
+            col=c_col-1
+        if(row >=0 and col >=0):
+            while(cellblock[row][col]!="." and cellblock[row][col]!=":"):
+                canvas.create_rectangle(ex0[row][col], ey0[row][col], ex1[row][col], ey1[row][col],fill="#A6A6A6", tags=("cursor"))
+                create_txt(row,col)
+                #if(gext[row][col] in [5,9,10,11,12,13,14,15]):
+                    #UI.create_cir(row,col)
+                    #if(valid[row][col]!=0):
+                        #UI.create_pol(row,col,valid[row][col])
+                if(cellno[row][col]!=0):
+                    create_cellno(row,col)
+                if across_down=="down":
+                    row=row-1
+                else:
+                    col=col-1
+                if (row <0 or col<0):
+                    break
+            # highlights and creates temporary entires for the cells to the right/down, that form the word along with the letter in highlighted cell
+        if (across_down=="down"):
+            row=c_row+1
+        else:
+            col=c_col+1
+        if(row <cells and col <width):
+            while(cellblock[row][col]!="." and cellblock[row][col]!=":"):
+                canvas.create_rectangle(ex0[row][col], ey0[row][col], ex1[row][col], ey1[row][col],fill="#A6A6A6", tags=("cursor"))
+                create_txt(row,col)
+                #if(gext[row][col] in [5,9,10,11,12,13,14,15]):
+                        #UI.create_cir(row,col)
+                    #if(valid[row][col]!=0):
+                        #UI.create_pol(row,col,valid[row][col])
+                if(cellno[row][col]!=0):
+                    create_cellno(row,col)
+                if across_down=="down":
+                    row=row+1
+                else:
+                    col=col+1
+                if (row == cells or col==width):
+                    break
+
+def cell_clicked(event):
+    # changes the focus word to the corresponding mouse click position
+    global row,col,n,cells,across_down,temp_str,taglist,temp_str     
+    x, y = event.x, event.y
+    if(is_multi==0):
+        if (MARGIN < x < WIDTH - MARGIN and MARGIN < y < HEIGHT - MARGIN):
+            canvas.focus_set()
+            # get row and col numbers from x,y coordinates
+            c_row, c_col = int((y - MARGIN) / SIDE), int((x - MARGIN) / SIDE)
+            if c_row >= 0 and c_col >= 0:
+                if cellblock[c_row][c_col]!="." and cellblock[c_row][c_col]!=":":
+                    row,col=c_row,c_col
+                    create_rect(row,col)
+
+def key_pressed(event):         
+    # associates character key pressed to the currently active cell in the grid
+        global row,col,across_down,taglist,temp_str,is_multi,multi,is_pencil,pencil,valid,temp_valid
+        if(is_multi==1):
+            # for rebus entries
+            if(len(multi)<8):
+                if event.keysym in 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' and cellblock[row][col]!="." and cellblock[row][col]!=":":
+                    canvas.delete("mults")
+                    x=(ex0[row][col]+ex1[row][col])/2+10
+                    y=(ey0[row][col]+ey1[row][col])/2+10
+                    strn=event.char
+                    multi.append(strn)
+                    canvas.create_text(x, y, text=''.join(multi),font=("Arial",10),tag="mults", fill="black")
+        else:
+            if row>=0 and col>=0 and event.keysym in 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz' and cellblock[row][col]!="." and cellblock[row][col]!=":":
+                # proceeds if solution hasen't been revealed yet
+                    prev_str=cellblock[row][col]
+                    if str(row)+","+str(col) in taglist:
+                        canvas.delete(str(row)+","+str(col))
+                        canvas.delete("temp_str"+str(row)+","+str(col))
+                    else:
+                        taglist.append(str(row)+","+str(col))
+                    x=(ex0[row][col]+ex1[row][col])/2+3
+                    y=(ey0[row][col]+ey1[row][col])/2+3
+                    strn=event.char
+                    cellblock[row][col]=strn.upper()                       
+                    canvas.create_text(x, y, text=strn.upper(),font=("Arial",16,"bold"), tag=(str(row)+","+str(col)), fill="black")
+                    if(across_down=="across" and col+1<width and cellblock[row][col+1]!="." and cellblock[row][col+1]!=":"):
+                        col=col+1
+                    if(across_down=="down" and row+1<cells and cellblock[row+1][col]!="." and cellblock[row+1][col]!=":"):
+                        row=row+1
+                    create_rect(row,col)
+                        
+
+# makes cell to the left as the currently active cell and current mode to across           
+def key_pressedL(event):
+    global row,col,across_down,taglist
+    if(is_multi==0 and across_down=="across"):
+        if col-1>=0:
+            c_col=col-1
+            if cellblock[row][c_col]=="." or cellblock[row][c_col]==":":
+                while(cellblock[row][c_col]=="." or cellblock[row][c_col]==":"):
+                    if c_col-1<0:
+                        break
+                    else:
+                        c_col=c_col-1
+            if (cellblock[row][c_col]!="." and cellblock[row][c_col]!=":"):
+                col=c_col
+        create_rect(row,col)
+    if(is_multi==0 and across_down=="down"):
+           across_down="across"
+           create_rect(row,col)
+           
+def save_sol():
+    temp=[]
+    for i in range(0,height):
+        if 'saved' not in puzzle:
+            temp.append([])
+        for j in range(0,width):
+            if 'saved' in puzzle:
+                if isinstance(puzzle['saved'][i][j],dict):
+                    puzzle['saved'][i][j]['value']=cellblock[i][j]
+                else:
+                    puzzle['saved'][i][j]=cellblock[i][j]
+            else:
+                temp[i].append(cellblock[i][j])
+    if 'saved' not in puzzle:
+        puzzle['saved']=temp
+    data = ipuz.write(puzzle, jsonp=True, callback_name="ipuz_function")
+    fo = open('/Users/arunprakashlakshminarayanan/Downloads/ipuz2.ipuz', "w")
+    fo.write(data)
+    fo.close()    
+
+def save_puz():
+    if 'title' in puzzle:
+        File.title=puzzle['title']
+    else:
+        File.title='title'        
+    if 'author' in puzzle:
+        File.author=puzzle['author']
+    else:
+        File.author='author'
+    if 'copyright' in puzzle:
+        File.cpyrt=puzzle['copyright']
+    else:
+        File.cpyrt='copyright'
+    if 'notes' in puzzle:
+        File.notes=puzzle['notes']
+    else:
+        File.notes='notes'
+    File.width=width
+    File.height=height
+    File.solnblock=solnblock
+    File.cellblock=cellblock
+    File.acc=acc
+    File.dwn=dwn
+    File.across=across
+    File.down=down
+    File.loc='/Users/arunprakashlakshminarayanan/Downloads/ipuz2.puz'
+    ipuz_Helper.filewrite(File)
+        
+# makes cell to the right as the currently active cell and current mode to across  
+def key_pressedR(event):
+    global row,col,across_down,taglist
+    if(is_multi==0 and across_down=="across"):
+        if col+1<width:
+            c_col=col+1
+            if cellblock[row][c_col]=="." or cellblock[row][c_col]==":":
+                while(cellblock[row][c_col]=="." or cellblock[row][c_col]==":"):
+                    if c_col+1==width:
+                        break
+                    else:
+                        c_col=c_col+1
+            if (cellblock[row][c_col]!="." and cellblock[row][c_col]!=":"):
+                col=c_col
+        create_rect(row,col)
+    if(is_multi==0 and across_down=="down"):
+        across_down="across"
+        create_rect(row,col)
+           
+# makes cell upper to the highlighted cell as the currently active cell  and current mode to down
+def key_pressedU(event):
+    global row,col,across_down,taglist
+    if(is_multi==0 and across_down=="down"):
+        if row-1>=0:
+            c_row=row-1
+            if cellblock[c_row][col]=="." or cellblock[c_row][col]==":":
+                while(cellblock[c_row][col]=="." or cellblock[c_row][col]==":"):
+                    if c_row-1<0:
+                        break
+                    else:
+                        c_row=c_row-1
+            if (cellblock[c_row][col]!="." and cellblock[c_row][col]!=":"):
+                row=c_row
+        create_rect(row,col)
+    if(is_multi==0 and across_down=="across"):
+        across_down="down"
+        create_rect(row,col)
+
+# makes cell below the highlighted cell as the currently active cell  and current mode to down
+def key_pressedD(event):
+    global row,col,across_down,taglist
+    if(is_multi==0 and across_down=="down"):
+        if row+1<cells:
+            c_row=row+1
+            if cellblock[c_row][col]=="." or cellblock[c_row][col]==":":
+                while(cellblock[c_row][col]=="." or cellblock[c_row][col]==":"):
+                    if c_row+1==cells:
+                        break
+                    else:
+                        c_row=c_row+1
+            if (cellblock[c_row][col]!="." and cellblock[c_row][col]!=":"):
+                row=c_row
+        create_rect(row,col)
+    if(is_multi==0 and across_down=="across"):
+        across_down="down"
+        create_rect(row,col)
+
+# assigns rebus entry to the corresponding cellblock when 'enter' key is pressed
+def key_pressedE(event):
+    global row,col,across_down,taglist,multi,is_multi
+    if(is_multi==1):
+        if str(row)+","+str(col) in taglist:
+            canvas.delete(str(row)+","+str(col))
+            canvas.delete("temp_str"+str(row)+","+str(col))
+        else:
+            taglist.append(str(row)+","+str(col))
+        canvas.delete("mults")
+        canvas.delete("mult")
+        x=(ex0[row][col]+ex1[row][col])/2+3
+        y=(ey0[row][col]+ey1[row][col])/2+3
+        cellblock[row][col]=''.join(multi)
+        cellblock[row][col]=cellblock[row][col].upper()
+        temp_text=cellblock[row][col]
+        if(len(temp_text)==1):
+            size=16
+        else:
+            size=10
+        if(len(temp_text)>2):
+            temp_text=temp_text[0:2]+".."
+        canvas.create_text(x, y, text=temp_text,font=("Arial",size,"bold"), tag=(str(row)+","+str(col)), fill="black")
+        del multi[:]
+        is_multi=0
+        listbox.config(state=NORMAL)
+        listbox1.config(state=NORMAL)
+           #UI.change_state("normal")
+        create_rect(row,col)
+        
+# deletes a letter from the cell when 'backspace' key is pressed        
+def key_pressedB(event):
+    global row,col,across_down,taglist,multi,is_multi
+    if(is_multi==1 and len(multi)>0):         
+        canvas.delete("mults")
+        x=(ex0[row][col]+ex1[row][col])/2
+        y=(ey0[row][col]+ey1[row][col])/2+10
+        del multi[len(multi)-1]
+        canvas.create_text(x, y, text=''.join(multi),font=("Arial",11),tag="mults", fill="black")
+    else:
+        if(cellblock[row][col] not in [":",".","-"]):
+            canvas.delete(str(row)+","+str(col))
+            canvas.delete("temp_str"+str(row)+","+str(col))
+            temp_str.remove("temp_str"+str(row)+","+str(col))
+            cellblock[row][col]="-"
+
+def list_clicked(no_clicked):
+# highlights  word associated with the clue selected
+    global row,col,n,cells,row_cellno,col_cellno,temp_str
+    if(is_multi==0):
+        row=row_cellno[no_clicked-1]
+        col=col_cellno[no_clicked-1]
+        create_rect(row,col)
+
+
+# when any clue in  across list box is clicked :
+def box_clickedA(event):
+    global across_down
+    if(is_multi==0):
+        across_down="across"
+        firstIndex = listbox.curselection()[0]
+        list_clicked(across[firstIndex][0])
+
+# when any clue in the down list box is clicked :      
+def box_clickedD(event):
+    global across_down
+    if(is_multi==0):
+        across_down="down"
+        firstIndex = listbox1.curselection()[0]
+        list_clicked(down[firstIndex][0])
+
+
+initUI()
+
+# menubar
+menubar = Menu(master)
+filemenu = Menu(menubar, tearoff=0)
+filemenu.add_command(label="Save", command=save_sol)
+filemenu.add_command(label="Save .puz", command=save_puz)
+master.config(menu=menubar,background="#D9DADA")             
+menubar.add_cascade(label="Edit", menu=filemenu)
+#clue for the selected text
+labelc = Label(fmB1,text="",relief=RIDGE,font=("Arial",15,"bold"),bg="#F2F2F2",foreground="#660000",padx=10,pady=4)
+labelc.config(justify=CENTER)
+labelc.pack(side=LEFT, fill=BOTH, expand =TRUE)
+
+# binds events to the corresponding methods
+listbox.bind("<<ListboxSelect>>", box_clickedA)
+listbox1.bind("<<ListboxSelect>>", box_clickedD)
+canvas.bind("<Button-1>", cell_clicked)
+master.bind("<Key>", key_pressed)
+master.bind("<Left>", key_pressedL)
+master.bind("<Right>", key_pressedR)
+master.bind("<Up>", key_pressedU)
+master.bind("<BackSpace>",key_pressedB)
+master.bind("<Return>",key_pressedE)
+master.bind("<Down>",key_pressedD)
+row,col=0,0
+
+
+

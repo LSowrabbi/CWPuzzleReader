@@ -74,7 +74,6 @@ data_file.close()
 try:
     puzzle = ipuz.read(data)
 except ipuz.IPUZException:
-    master.withdraw()
     messagebox.showinfo("Sorry!", "File corrupted")
     sys.exit(0)
 #puzzle['dimensions']['width']=5
@@ -106,6 +105,7 @@ else:
     cpyrt='copyright'
 if 'notes' in puzzle:
     notes=puzzle['notes']
+    notes_state="normal"
 else:
     notes=''
 if 'Across' in puzzle['clues'] and 'Down' in puzzle['clues']:      
@@ -1081,11 +1081,10 @@ class UI():
             scrollbar1.config(command=listbox1.yview)
 
     def save_sol():
-        if 'saved' not in puzzle:
-            temp_l=[]
+        temp_l=[]
         for i in range(0,height):
             if 'saved' not in puzzle:
-                temp_l[i].append([])            
+                temp_l.append([])            
             for j in range(0,width):
                 if cellblock[i][j]==".":
                     if 'saved' in puzzle:
@@ -1112,7 +1111,7 @@ class UI():
                     else:
                         temp_l[i].append(cellblock[i][j])
         if 'saved' not in puzzle:
-            puzzle['saved'].append(temp_l)
+            puzzle['saved']=temp_l
         data = ipuz.write(puzzle, jsonp=True, callback_name="ipuz_function")
         ofile=open(ifil,mode='w')
         ofile.write(data)
@@ -1348,3 +1347,6 @@ class UI():
 UI.create_rect(row,col)
 UI.update_clock()
 master.mainloop()
+
+
+

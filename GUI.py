@@ -978,6 +978,52 @@ class UI():
             ofl.write(temp.encode(Encoding_2))
         ofl.close()
 
+    def save_latex():
+        file_opt=opt = {}
+        col_space=[]
+        max_col=0
+        opt['filetypes'] = [('all files', '.*'), ('text files', '.tex')]
+        opt['parent'] = master
+        fileloc = filedialog.asksaveasfilename(**file_opt,defaultextension='.tex')
+        ofil=fileloc
+        ofl=open(ofil,mode='wb')
+        ofl.write(("\\documentclass{article}\n").encode(Encoding_2))
+        ofl.write(("\\usepackage[unboxed]{cwpuzzle}\n").encode(Encoding_2))       
+        ofl.write(("\\begin{document}\n").encode(Encoding_2))
+        ofl.write(("\\begin{Puzzle}{"+str(width)+"}{"+str(height)+"}\n").encode(Encoding_2))
+        for i in range (0,height):
+            temp=""
+            for j in range (0,width):
+                temp=temp+"|"               
+                if(solnblock[i][j]=="."):
+                    temp=temp+"*  "
+                else:
+                    if(cellno[i][j]!=0):
+                        temp=temp+"["+str(cellno[i][j])+"]"                     
+                    temp=temp+solnblock[i][j]+" "
+            temp=temp+"|."
+            ofl.write((temp+"\n").encode(Encoding_2))
+        ofl.write(("\\end{Puzzle}\n").encode(Encoding_2))
+        ofl.write(("\\begin{PuzzleClues}{\\textbf{Across}}\n").encode(Encoding_2))
+        for i in range(0,acc):
+            ct=across[i][0]
+            r=row_cellno[ct-1]
+            c=col_cellno[ct-1]
+            temp_st=UI.findsolacross(r,c)
+            temp="\\Clue{"+str(across[i][0])+"}{"+temp_st+"}{"+across[i][1].replace("_","\_")+"}"
+            ofl.write((temp+"\n").encode(Encoding_2))
+        ofl.write(("\\end{PuzzleClues}\n\n").encode(Encoding_2))
+        ofl.write(("\\begin{PuzzleClues}{\\textbf{Down}}\n").encode(Encoding_2))
+        for i in range(0,dwn):
+            ct=down[i][0]
+            r=row_cellno[ct-1]
+            c=col_cellno[ct-1]
+            temp_st=UI.findsoldown(r,c)
+            temp="\\Clue{"+str(down[i][0])+"}{"+temp_st+"}{"+down[i][1].replace("_","\_")+"}"
+            ofl.write((temp+"\n").encode(Encoding_2))
+        ofl.write(("\\end{PuzzleClues}\n").encode(Encoding_2))           
+        ofl.write(("\\end{document}\n").encode(Encoding_2))
+        ofl.close()
 
     def check_key():
         global check_reveal_state,unlock_state,soln_state,checksum_sol
@@ -1036,6 +1082,7 @@ class UI():
     filemenu = Menu(menubar, tearoff=0)
     filemenu.add_command(label="Save", command=save_sol)
     filemenu.add_command(label="Save as Text File", command=save_txt)
+    filemenu.add_command(label="Save as Latex File", command=save_latex)
     filemenu.add_command(label="Clear Puzzle", command=clear_cells)
     filemenu.add_command(label="Multiple Entry", command=multiple_sol)
     filemenu.add_checkbutton(label="Use Pencil", variable = is_pencil, onvalue = 1, offvalue = 0)

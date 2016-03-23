@@ -993,6 +993,19 @@ class UI():
             ofl.write(temp.encode(Encoding_2))
         ofl.close()
 
+    def replace_spl_char(tex_str):
+        tex_str=tex_str.replace("_","\_")
+        tex_str=tex_str.replace("&","\&")
+        tex_str=tex_str.replace("~","\~")
+        tex_str=tex_str.replace("^","\^")
+        tex_str=tex_str.replace(repr("\\"),repr("\\\\"))
+        tex_str=tex_str.replace("#","\#")
+        tex_str=tex_str.replace("$","\$")
+        tex_str=tex_str.replace("%","\%")
+        tex_str=tex_str.replace("{","\{")
+        tex_str=tex_str.replace("}","\}")
+        return tex_str
+    
     def save_latex():
         file_opt=opt = {}
         col_space=[]
@@ -1025,8 +1038,7 @@ class UI():
             r=row_cellno[ct-1]
             c=col_cellno[ct-1]
             temp_st=UI.findsolacross(r,c)
-            temp_st1=across[i][1].replace("_","\_")
-            temp_st1=temp_st1.replace("&","\&")
+            temp_st1=UI.replace_spl_char(across[i][1])
             temp="\\Clue{"+str(across[i][0])+"}{"+temp_st+"}{"+temp_st1+"}"
             ofl.write((temp+"\n").encode(Encoding_2))
         ofl.write(("\\end{PuzzleClues}\n\n").encode(Encoding_2))
@@ -1036,8 +1048,7 @@ class UI():
             r=row_cellno[ct-1]
             c=col_cellno[ct-1]
             temp_st=UI.findsoldown(r,c)
-            temp_st1=down[i][1].replace("_","\_")
-            temp_st1=temp_st1.replace("&","\&")
+            temp_st1=UI.replace_spl_char(down[i][1])
             temp="\\Clue{"+str(down[i][0])+"}{"+temp_st+"}{"+temp_st1+"}"
             ofl.write((temp+"\n").encode(Encoding_2))
         ofl.write(("\\end{PuzzleClues}\n").encode(Encoding_2))           

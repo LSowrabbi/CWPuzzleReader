@@ -93,6 +93,21 @@ class UI():
             i=i+1
         return curstr
     
+    # finds solution for an across or down word, taking the starting row and column for that word as the input
+    def findsolacross(i,j):
+        curstr=""
+        while((j<width) and  (cellblock[i][j]!="." and cellblock[i][j]!=":")):
+            curstr=curstr+solnblock[i][j]
+            j=j+1
+        return curstr
+
+    def findsoldown(i,j):
+        curstr=""
+        while((i<height) and (cellblock[i][j]!="." and cellblock[i][j]!=":")):
+            curstr=curstr+solnblock[i][j]
+            i=i+1
+        return curstr
+        
     # creates temporary text for highlighted cells
     def create_txt(row,col):
         global temp_str
@@ -982,7 +997,7 @@ class UI():
         file_opt=opt = {}
         col_space=[]
         max_col=0
-        opt['filetypes'] = [('all files', '.*'), ('text files', '.tex')]
+        opt['filetypes'] = [('all files', '.*'), ('tex files', '.tex')]
         opt['parent'] = master
         fileloc = filedialog.asksaveasfilename(**file_opt,defaultextension='.tex')
         ofil=fileloc
@@ -995,7 +1010,7 @@ class UI():
             temp=""
             for j in range (0,width):
                 temp=temp+"|"               
-                if(solnblock[i][j]=="."):
+                if(solnblock[i][j] in [".",":"]):
                     temp=temp+"*  "
                 else:
                     if(cellno[i][j]!=0):
@@ -1019,7 +1034,9 @@ class UI():
             r=row_cellno[ct-1]
             c=col_cellno[ct-1]
             temp_st=UI.findsoldown(r,c)
-            temp="\\Clue{"+str(down[i][0])+"}{"+temp_st+"}{"+down[i][1].replace("_","\_")+"}"
+            temp_st1=down[i][1].replace("_","\_")
+            temp_st1=temp_st1.replace("&","\&")
+            temp="\\Clue{"+str(down[i][0])+"}{"+temp_st+"}{"+temp_st1+"}"
             ofl.write((temp+"\n").encode(Encoding_2))
         ofl.write(("\\end{PuzzleClues}\n").encode(Encoding_2))           
         ofl.write(("\\end{document}\n").encode(Encoding_2))

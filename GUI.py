@@ -1025,7 +1025,9 @@ class UI():
             r=row_cellno[ct-1]
             c=col_cellno[ct-1]
             temp_st=UI.findsolacross(r,c)
-            temp="\\Clue{"+str(across[i][0])+"}{"+temp_st+"}{"+across[i][1].replace("_","\_")+"}"
+            temp_st1=across[i][1].replace("_","\_")
+            temp_st1=temp_st1.replace("&","\&")
+            temp="\\Clue{"+str(across[i][0])+"}{"+temp_st+"}{"+temp_st1+"}"
             ofl.write((temp+"\n").encode(Encoding_2))
         ofl.write(("\\end{PuzzleClues}\n\n").encode(Encoding_2))
         ofl.write(("\\begin{PuzzleClues}{\\textbf{Down}}\n").encode(Encoding_2))

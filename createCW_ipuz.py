@@ -803,7 +803,7 @@ def save_sol_text():
         writetext(File)
         messagebox.showinfo("", "Puzzle has been saved as text file successfully")
 
-def save_sol():
+def save_sol(save_choice):
     global location
     location=StringVar()
     check_block=True

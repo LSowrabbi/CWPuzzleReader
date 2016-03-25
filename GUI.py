@@ -944,7 +944,7 @@ class UI():
         max_col=0
         opt['filetypes'] = [('all files', '.*'), ('text files', '.txt')]
         opt['parent'] = master
-        fileloc = filedialog.asksaveasfilename(**file_opt,defaultextension='.txt')
+        fileloc = filedialog.asksaveasfilename(filetypes=opt['filetypes'])
         ofil=fileloc
         ofl=open(ofil,mode='wb')
         ofl.write(("\n  ").encode(Encoding_2))
@@ -1012,7 +1012,7 @@ class UI():
         max_col=0
         opt['filetypes'] = [('all files', '.*'), ('tex files', '.tex')]
         opt['parent'] = master
-        fileloc = filedialog.asksaveasfilename(**file_opt,defaultextension='.tex')
+        fileloc = filedialog.asksaveasfilename(filetypes=opt['filetypes'])
         ofil=fileloc
         ofl=open(ofil,mode='wb')
         ofl.write(("\\documentclass{article}\n").encode(Encoding_2))

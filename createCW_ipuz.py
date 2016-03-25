@@ -787,7 +787,7 @@ def save_sol_text():
         file_opt=opt = {}
         opt['filetypes'] = [('all files', '.*'), ('text files', '.txt')]
         opt['parent'] = master
-        fileloc = filedialog.asksaveasfilename(**file_opt,defaultextension='.txt')
+        fileloc = filedialog.asksaveasfilename(filetypes=opt['filetypes'])
         File.title=title
         File.author=author
         File.cpyrt=cpyrt
@@ -835,12 +835,12 @@ def save_sol():
            opt['filetypes'] = [('all files', '.*'), ('binary files', '.puz')]
            #options['initialfile'] = 'My_CW_File.puz'
            opt['parent'] = master
-           fileloc = filedialog.asksaveasfilename(**file_opt,defaultextension='.puz')
+           fileloc = filedialog.asksaveasfilename(filetypes=opt['filetypes'])
        else:
            opt['filetypes'] = [('all files', '.*'), ('ipuz files', '.ipuz')]
-           #options['initialfile'] = 'My_CW_File.puz'
+           #options['initialfile'] = 'My_CW_File.ipuz'
            opt['parent'] = master
-           fileloc = filedialog.asksaveasfilename(**file_opt,defaultextension='.ipuz')
+           fileloc = filedialog.asksaveasfilename(filetypes=opt['filetypes'])
        File.title=title
        File.author=author
        File.cpyrt=cpyrt
@@ -868,7 +868,7 @@ def save_txt():
     Encoding_2 = "ISO-8859-1"
     opt['filetypes'] = [('all files', '.*'), ('text files', '.txt')]
     opt['parent'] = master
-    fileloc = filedialog.asksaveasfilename(**file_opt,defaultextension='.txt')
+    fileloc = filedialog.asksaveasfilename(filetypes=opt['filetypes'])
     ofil=fileloc
     ofl=open(ofil,mode='wb')
     ofl.write(("\n  ").encode(Encoding_2))

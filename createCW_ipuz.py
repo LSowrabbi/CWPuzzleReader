@@ -804,7 +804,6 @@ def save_sol_text():
         messagebox.showinfo("", "Puzzle has been saved as text file successfully")
 
 def save_sol():
-    save_choice=1
     global location
     location=StringVar()
     check_block=True
@@ -1153,8 +1152,8 @@ def initUI():
     # menubar
     menubar = Menu(master)
     filemenu = Menu(menubar, tearoff=0)
-    filemenu.add_command(label="Create .puz file", command=save_sol)
-    filemenu.add_command(label="Create .ipuz file", command=save_sol)
+    filemenu.add_command(label="Create .puz file", command= lambda: save_sol(0))
+    filemenu.add_command(label="Create .ipuz file", command= lambda: save_sol(1))
     filemenu.add_command(label="Save partially completed puzzle as text file", command=save_sol_text)   
     filemenu.add_command(label="Copy work to a text file", command=save_txt)
     filemenu.add_command(label="Multiple Entry", command=multiple_sol)

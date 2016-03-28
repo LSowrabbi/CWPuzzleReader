@@ -472,26 +472,6 @@ def textentered(event=0):
         messagebox.showinfo("Sorry!", msg)
     canvas.focus_set()
     create_rect(row,col)
-
-def save_sol_text():
-        file_opt=opt = {}
-        opt['filetypes'] = [('all files', '.*'), ('text files', '.txt')]
-        opt['parent'] = master
-        fileloc = filedialog.asksaveasfilename(**file_opt,defaultextension='.txt')
-        File.title=title
-        File.author=author
-        File.cpyrt=cpyrt
-        File.notes=notes
-        File.width=width
-        File.height=height
-        File.solnblock=cellblock
-        File.acc=acc
-        File.dwn=dwn
-        File.across=across
-        File.down=down
-        File.loc=fileloc
-        writetext(File)
-        messagebox.showinfo("", "Puzzle has been saved as text file successfully")
         
 def save_sol():
     global location
@@ -516,7 +496,7 @@ def save_sol():
         opt['filetypes'] = [('all files', '.*'), ('binary files', '.puz')]
         #options['initialfile'] = 'My_CW_File.puz'
         opt['parent'] = master
-        fileloc = filedialog.asksaveasfilename(**file_opt,defaultextension='.puz')
+        fileloc = filedialog.asksaveasfilename(filetypes=opt['filetypes'])
         File.title=title
         File.author=author
         File.cpyrt=cpyrt
@@ -540,7 +520,7 @@ def save_txt():
     Encoding_2 = "ISO-8859-1"
     opt['filetypes'] = [('all files', '.*'), ('text files', '.txt')]
     opt['parent'] = master
-    fileloc = filedialog.asksaveasfilename(**file_opt,defaultextension='.txt')
+    fileloc = filedialog.asksaveasfilename(filetypes=opt['filetypes'])
     ofil=fileloc
     ofl=open(ofil,mode='wb')
     ofl.write(("\n  ").encode(Encoding_2))
@@ -783,8 +763,6 @@ def initUI(w,h,cb,across0,down0,cellno0,rc,cc):
     menubar = Menu(master)
     filemenu = Menu(menubar, tearoff=0)
     filemenu.add_command(label="Create Puzzle", command=save_sol)  
-#    filemenu.add_command(label="Create .ipuz file", command=save_sol_ipuz)
-#    filemenu.add_command(label="Save partially completed puzzle as text file", command=save_sol_text) 
     filemenu.add_command(label="Copy work to a text file", command=save_txt)
  #   filemenu.add_command(label="Multiple Entry", command=multiple_sol)
     filemenu.add_command(label="Clear Puzzle", command=clear_cells)

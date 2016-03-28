@@ -1146,7 +1146,7 @@ class UI():
         file_opt=opt = {}
         opt['filetypes'] = [('all files', '.*'), ('puz files', '.puz')]
         opt['parent'] = master
-        fileloc = filedialog.asksaveasfilename(**file_opt,defaultextension='.puz')
+        fileloc = filedialog.asksaveasfilename(filetypes=opt['filetypes'])
         File.loc=fileloc
         ipuz_Helper.filewrite(File)
     
@@ -1156,7 +1156,7 @@ class UI():
         max_col=0
         opt['filetypes'] = [('all files', '.*'), ('text files', '.txt')]
         opt['parent'] = master
-        fileloc = filedialog.asksaveasfilename(**file_opt,defaultextension='.txt')
+        fileloc = filedialog.asksaveasfilename(filetypes=opt['filetypes'])
         ofil=fileloc
         ofl=open(ofil,mode='wb')
         ofl.write(("\n  ").encode(Encoding_2))

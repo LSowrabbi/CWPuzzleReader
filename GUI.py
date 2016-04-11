@@ -189,9 +189,9 @@ class UI():
             cur_clue_ad="down"
             dull_clue_ad="across"
         # finds new dull and current clues
-        while(c_col!=0 and cellblock[c_row][c_col]!='.'):
+        while(c_col!=0 and (cellblock[c_row][c_col]!='.' and cellblock[c_row][c_col]!=':')):
             c_col=c_col-1
-        if(cellblock[c_row][c_col]=='.'):
+        if(cellblock[c_row][c_col]=='.' or cellblock[c_row][c_col]==':'):
             c_col=c_col+1
         for i in range(0,acc+1):
             if(i!=acc):
@@ -207,9 +207,9 @@ class UI():
                 cur_clue=0
             else:
                 dull_clue=0
-        while(c_row!=0 and cellblock[c_row][d_col]!='.'):
+        while(c_row!=0 and (cellblock[c_row][d_col]!='.' and cellblock[c_row][d_col]!=':')):
             c_row=c_row-1
-        if(cellblock[c_row][d_col]=='.'):
+        if(cellblock[c_row][d_col]=='.' or cellblock[c_row][d_col]==':'):
             c_row=c_row+1
         for i in range(0,dwn+1):
             if(i!=dwn):

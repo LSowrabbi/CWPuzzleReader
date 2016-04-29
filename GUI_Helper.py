@@ -161,7 +161,6 @@ def filewrite(nth_edit,new_t,new_ts):
                         no_of_clues = no_of_clues-1
                     else:
                         # finds the notes that comes along with the puzzle
-                        # notes=str(b[begn:i].decode('iso-8859-1'))
                         notes=b[begn:i]
                         if(notes.decode(Encoding_2)==""):
                             notes_state="disabled"
@@ -228,7 +227,7 @@ def filewrite(nth_edit,new_t,new_ts):
             
 
 
-	# finds current state of an across or down word, taking the starting row and column for that word as the input
+    # finds current state of an across or down word, taking the starting row and column for that word as the input
     def findcurracross(i,j):
         curstr=""
         while((j<width) and  (cellblock[i][j]!="." and cellblock[i][j]!=":")):

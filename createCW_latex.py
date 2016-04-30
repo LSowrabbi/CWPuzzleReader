@@ -1,8 +1,8 @@
 import subprocess
+import sys
 from itertools import groupby
 from subprocess import  call
-import sys
-from Latex_Helper import *
+from createCW_latexHelper import *
 from tkinter import *
 master = Tk()
 master.withdraw()
@@ -10,10 +10,12 @@ master.update()
 width=0
 height=0
 index=0
+
 ftypes = [('TEX files', '*.tex'), ('All files', '*')]
 dlg = filedialog.Open(filetypes = ftypes)
 ifil = dlg.show()
 master.destroy()
+# reads puzzle description from the LaTex file
 with open(ifil,"r",encoding='utf-8') as ins:
     arr=[]
     i=-1
@@ -31,12 +33,12 @@ with open(ifil,"r",encoding='utf-8') as ins:
 
 
 array=[]
+# splits the array based on the arguments (end of the argument is detected by '}') 
 for j  in range(len(arr)):
     str1=arr[j][0]
     array.append(str1.split('}'))
 
-#for i in range(len(array)):
-#    print(array[i])
+# finds the width and height of the array from the array
 for i in range(0,len(array)):
     if("\\begin{Puzzle" in array[i]):
         ind=array[i].index("\\begin{Puzzle")
@@ -51,6 +53,7 @@ for i in range(0,len(array)):
             else:
                 ind=ind+1
 
+# exits the program if width/height cannot be found
 if(width==0 or height==0):
     sys.exit(0)
 
@@ -67,8 +70,6 @@ for i in range(height):
 i=index+1
 row=0
 col=0
-#for i in range(len(array)):
-#    print(array[i])
 while('\\end{Puzzle' not in array[i]):
     array[i][0].replace(" ","")
     temp=array[i][0].split('|')

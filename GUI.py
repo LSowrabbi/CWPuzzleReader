@@ -347,7 +347,7 @@ class UI():
                  col=col_cellno[no_clicked-1]
                  UI.create_rect(row,col)
 
-    # changes state of the check, reveal and unlock options available in the solution menu
+    # changes state of the entries in the menubar
     def change_state(c_state):
         if(c_state=="disabled"):
             UI.solnmenu.entryconfig(0,state=c_state)

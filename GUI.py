@@ -997,7 +997,7 @@ class UI():
             ofl.write(temp.encode(Encoding_2))
         ofl.close()
 
-    # inserts a prefix '\' to special characters in Latex
+    # inserts a prefix '\' to special characters in Latex in order to print them like any other character
     def replace_spl_char(tex_str):
         tex_str=tex_str.replace("_","\_")
         tex_str=tex_str.replace("&","\&")

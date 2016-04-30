@@ -157,13 +157,13 @@ for i in range(0,height):
             cellblock[i].append(puzzle['puzzle'][i][j]['cell'])
         else:
             cellblock[i].append(puzzle['puzzle'][i][j])
-        if cellblock[i][j]!=block and cellblock[i][j]!=empty and cellblock[i][j]!="null":
+        if cellblock[i][j]!=block and cellblock[i][j]!=empty and cellblock[i][j]!="null"  and cellblock[i][j]!=None:
             row_cellno.append(i)
             col_cellno.append(j)
             cellno[i].append(cellblock[i][j])
         else:
             cellno[i].append(0)            
-        if cellblock[i][j]==block or cellblock[i][j]=="null":
+        if cellblock[i][j]==block or cellblock[i][j]=="null" or cellblock[i][j]==None:
             cellblock[i][j]="."
             solnblock[i].append(".")
         else:

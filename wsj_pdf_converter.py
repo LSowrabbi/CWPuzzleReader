@@ -3,8 +3,7 @@ import subprocess
 from createCW_pdf import *
 from itertools import groupby
 from subprocess import  call
-#str1 = "pdftotext"+" -layout"
-#call (["pdftotext", " puzzle20160119.pdf"])
+
 master = Tk()
 master.withdraw()
 master.update()
@@ -12,11 +11,12 @@ width=15
 height=15
 max_cellno=0
 
-
+# 'ifil' is the text file we get after implementing 'pdftotext' command
 ftypes = [('Text files', '*.txt'), ('All files', '*')]
 dlg = filedialog.Open(filetypes = ftypes)
 ifil = dlg.show()
 master.destroy()
+# read puzzle data from 'ifil'
 with open(ifil,"r",encoding='utf-8') as ins:
     array=[]
     i=-1
@@ -25,7 +25,8 @@ with open(ifil,"r",encoding='utf-8') as ins:
         x=[]
         x.append(line)
         array.append(x)
-        
+
+# splits the read data based on its layout        
 def splitWithIndices(s,c=' '):
     p = 0
     for k,g in groupby(s,lambda x:x==c):
@@ -53,6 +54,7 @@ for j in range(15):
 
 eog=0
 str2=array[2][0]
+# finds the position where the grid ends
 for j in range(len(str2)):
     if (str2[j]=='\t'):
         eog=j
@@ -62,17 +64,18 @@ for j in range(1,len(array)):
     strx=array[j][0]
     lst1=array2[j]
     lst2=array3[j]
-##    print(lst1,lst2)
+    # finds the position where the cluelist begins
     if (len(lst1)-len(lst2) ==0):
         flag=0
         if ((j>5) and  (not lst2)):
             cluestart=j
             break
-        #find empty spaces
+        # finds empty spaces
         if ((j > 5) and (lst1[0][0]<10) and (not (lst2[0].isdigit())) ):
             cluestart=j
             break
-        
+
+# quits the program if cluestart position cannot be found     
 if (cluestart==0):
     sys.exit(0)
     
@@ -81,6 +84,7 @@ if (eog==0):
 
 endofgrid=[]
 
+# end of grid array maintains the end position for each row in the grid
 for i in range(0,cluestart):
     endofgrid.append(eog)
 num=1
@@ -89,6 +93,7 @@ temp_cl=[]
 count=0
 temp_eog=[]
 
+# finds the endofgrid and cellnumbers present in each row of the grid  
 for j in range(1,cluestart):
         l=[]
         as2=array2[j]
@@ -112,10 +117,13 @@ for j in range(1,cluestart):
             temp_eog.append(endofgrid[j])
             temp_s=endofgrid[j]/15
             for i in range(len(temp_cl[count])):
+                # denotes the width of each cell
                 temp_cl[count][i][1]=round(temp_cl[count][i][1]/temp_s)
             count=count+1
 
 max_eog=min(endofgrid)   
+# sometimes a single cellno. (at the beginning or end of any row) might be printed on a new line
+# this step appends such cells to the corresponding row's list
 if(count!=15):
     for i in range(0,len(temp_cl)):
         if(len(temp_cl[i])==1 and temp_eog[i]>50):
@@ -134,10 +142,13 @@ if(count!=15):
                     temp_cl[i+1].insert(0,temp_cl[i][0])
                 else:
                      temp_cl[i-1].insert(0,temp_cl[i][0])
-                     
+
+# 'clnum' holds all cellnos corresponding to each row after the above filtering step                     
 for i in range(0,len(temp_cl)):
     if(len(temp_cl[i])>1):
         clnum.append(temp_cl[i])
+        
+# assigns each cell, its cellno. (if it has one)        
 for i in range(0,len(clnum)):
     for j in range(0,len(clnum[i])):
         val=clnum[i][j][0]
@@ -169,11 +180,13 @@ for i in range(0,len(clnum)):
         else:
             cellblock[i][col]=val
 
+# 'max_cell' holds the maximum cellno.
 max_cell=0
 for i in range(15):
     max_cell=max(max_cell,max(cellblock[i]))
 
 len1=0
+# finds the rightmost position of any entry in the cluelist
 for i in range(len(array)):
     if (len(array[i][0])>len1):
         len1=len(array[i][0])
@@ -183,23 +196,24 @@ title_set=False
 found_across=False
 colspace1=int(max_eog/3)-1
 colspace2=int((len1-max_eog)/2)-1
+# firstcolumn,secondcolumn and thirdcolumn denotes the cluelist entries present below the grid in the pdf file
 firstcolumn=[]
 secondcolumn=[]
 thirdcolumn=[]
-#for i in range(cluestart+1,len(array)):
-#    if(len(array2[i])>0 and len(array3[i])>0):
-#        print(str(array2[i][0])+str(array3[i][0]))
 for i in range(cluestart,len(array)):
     ax=array2[i]
     bx=array3[i]
     if(len(ax)==len(bx) and i!=(len(array)-1)):
+        # checks whether the last row of the document has been reached
         if(ax[0][0]==4 and array2[i+1][0][0]==0 and array2[i+1][0][1]==2 and array3[i+1][0]=="s"):
            break
         for j in range(len(ax)):
+            # finds the title and author that would be present just before the rows containing across cluelist
             if(found_across!=True):
                 if(bx[0]=="Across"):
                     found_across=True
                 else:
+                    # title is separated from the author by '|'
                     if(title_set==True and ax[j][0]<max_eog):
                         author=author+" "+bx[j]
                     if(title_set==False and bx[j]=='|' and ax[j][0]<max_eog):
@@ -215,6 +229,7 @@ for i in range(cluestart,len(array)):
                 else:
                     firstcolumn.append(bx[j])
             else:
+                # stores the cluelist to the respective columns to which they belong to
                 if (ax[j][0]<2*colspace1):
                     if(j+1<len(bx) and ax[j+1][1]>(2*colspace1) and bx[j].isdigit()):
                         if(int(bx[j])<max_cell):
@@ -228,9 +243,8 @@ for i in range(cluestart,len(array)):
                         thirdcolumn.append(bx[j])
 
 
-
-#print(firstcolumn,"\n" ,secondcolumn,"\n",thirdcolumn)
 rowend=0
+# 'rowend' represents the position to the right of the grid's endpoint
 for i in range(cluestart+1,len(array)-10):
     ax=array2[i]
     bx=array3[i]
@@ -241,10 +255,12 @@ for i in range(cluestart+1,len(array)-10):
                     rowend=i
                     break
 
+# fourthcolumn and fifthcolumn denotes the cluelist entries present to the right of the grid in pdf file
 fourthcolumn=[]
 fifthcolumn=[]
 gridend=max_eog
 
+# decides whether the clue belongs to fourth or fifth column, for each entry in the cluelist present to the right of the grid
 for i in range(1,rowend):
     ax=array2[i]
     bx=array3[i]
@@ -264,9 +280,7 @@ for i in range(1,rowend):
 xrows={}
 xcols={}
 xmax=0
-#print(max_eog)
-#print(array2[16])
-#print(array3[16])
+# stores the row and column corresponding to each cell in the grid that has a cellno. 
 for i in range(15):
     for j in range(15):
         if (cellblock[i][j]>0):
@@ -275,11 +289,7 @@ for i in range(15):
             if (cellblock[i][j]>xmax):
                 xmax=cellblock[i][j]
 
-#print(firstcolumn)
-#print(secondcolumn)
-#print(thirdcolumn)
-#print(fourthcolumn)
-#print(fifthcolumn)
+
 across0=[]
 xacross=[]
 xdown=[]
@@ -290,37 +300,14 @@ strc=""
 clue1=[]
 direction=0
 cur_no=0
-#for i in range(len(firstcolumn)):
-#    if (firstcolumn[i]=="Across"):
-#        direction=1
-#        cur_no=int(firstcolumn[i+1])
-#    else:
-#        if (firstcolumn[i].isdigit() and direction==1):
-#            if(int(firstcolumn[i])>cur_no and int(firstcolumn[i])<max_cell):
-#                if (flag>0):
-#                    clue1.insert(1,strc)
-#                    across.append(clue1)
-#                flag=0
-#                clue1=[]
-#                strc=""
-#                clue1.insert(0,int(firstcolumn[i]))
-#                xacross.insert(xcount,int(firstcolumn[i]))
-#                cur_no=int(firstcolumn[i])
-#                xcount=xcount+1
-#            else:
-#                strc=strc+firstcolumn[i]+" "
-#                flag=1
-#        else:
-#            if(direction==1):
-#                strc=strc+firstcolumn[i]+" "
-#                flag=1
+
 
 for i in range(len(firstcolumn)):
     if (firstcolumn[i]=="Across"):
-        #cur_no=int(firstcolumn[i+1])
         cur_no=0
         direction=1
     else:
+        # when a new clue is encountered
         if (firstcolumn[i].isdigit() and direction==1 and int(firstcolumn[i])>cur_no and int(firstcolumn[i])<=max_cell):
             cur_no=int(firstcolumn[i])
             if (flag>0):
@@ -333,12 +320,14 @@ for i in range(len(firstcolumn)):
             xacross.insert(xcount,int(firstcolumn[i]))
             xcount=xcount+1
         else:
+            # checks whether the clueno. has been merged with the clue entry present to the right of it
             j=0
             while(j<len(firstcolumn[i])):
                 if(firstcolumn[i][j].isdigit()):
                     j=j+1
                 else:
                     break
+            # if yes, separates the clueno. from the clue entry to the right of it
             if(j>0 and int(firstcolumn[i][0:j])>cur_no and direction==1  and int(firstcolumn[i][0:j])<=max_cell and ("Across" not in firstcolumn[i][j:]) and ("Down" not in firstcolumn[i][j:]) and ("-" not in firstcolumn[i][j:])):                
                 cur_no=int(firstcolumn[i][0:j])
                 if (flag>0):
@@ -357,6 +346,7 @@ for i in range(len(secondcolumn)):
     if (secondcolumn[i]=="Across"):
         direction=1
     else:
+        # when a new clue is encountered
         if (secondcolumn[i].isdigit() and direction==1 and int(secondcolumn[i])>cur_no and int(secondcolumn[i])<=max_cell):
             cur_no=int(secondcolumn[i])
             if (flag>0):
@@ -369,12 +359,14 @@ for i in range(len(secondcolumn)):
             xacross.insert(xcount,int(secondcolumn[i]))
             xcount=xcount+1
         else:
+            # checks whether the clueno. has been merged with the clue entry present to the right of it
             j=0
             while(j<len(secondcolumn[i])):
                 if(secondcolumn[i][j].isdigit()):
                     j=j+1
                 else:
                     break
+            # if yes, separates the clueno. from the clue entry to the right of it
             if(j>0 and int(secondcolumn[i][0:j])>cur_no and direction==1  and int(secondcolumn[i][0:j])<=max_cell and ("Across" not in secondcolumn[i][j:]) and ("Down" not in secondcolumn[i][j:]) and ("-" not in secondcolumn[i][j:])):                
                 cur_no=int(secondcolumn[i][0:j])
                 if (flag>0):
@@ -390,9 +382,10 @@ for i in range(len(secondcolumn)):
                 flag=1
                 
 for i in range(len(thirdcolumn)):
-    #and 3rd col[i-1]!=isdigit
+    # direction is set to 1 while going through across cluelist
+    # direction is set to 2 while going through down cluelist
+    # checks if the end of across cluelist has been reached
     if (thirdcolumn[i]=="Down"):
-#        cur_no=int(thirdcolumn[i+1])
         cur_no=0
         direction=2
         xcount=0
@@ -450,7 +443,6 @@ for i in range(len(thirdcolumn)):
 
 for i in range(len(fourthcolumn)):
     if (fourthcolumn[i]=="Down"):
-        #cur_no=int(fourthcolumn[i+1])
         cur_no=0
         direction=2
         xcount=0
@@ -562,18 +554,8 @@ for i in range(len(fifthcolumn)):
 clue1.insert(1,strc)
 down0.append(clue1)
 
-#for i in range(len(across)):         
-#    print(across[i])
-#for i in range(len(down)):    
-#    print(down[i])
-#for j in range(15):
-#    print(row[j])                                       
-
-#print(xacross)
-#print(xdown)   
+# finds the shaded cells in the grid based on across clue numbers   
 for i in range(len(xacross)):
- #   print(xacross[i])
-#    print(across0[i])
     xi=str(xacross[i])
     if (xi in xrows):
         ir=xrows[xi]
@@ -581,9 +563,8 @@ for i in range(len(xacross)):
         if ((ic>0) and cellblock[ir][ic-1] ==0):
             cellblock[ir][ic-1]='.'
 
+# finds the shaded cells in the grid based on down clue numbers   
 for i in range(len(xdown)):
-#    print(down0[i])
-#    print(xdown[i])
     xi=str(xdown[i])
     if (xi in xrows):
         ir=xrows[xi]
@@ -591,15 +572,14 @@ for i in range(len(xdown)):
         if ((ir>0) and (cellblock[ir-1][ic] ==0)):
             cellblock[ir-1][ic]='.'
 
-
+# assigns null value ('-') for all unshaded cells 
 for i in range(0,height):
     for j in range(0,width):
         if(cellblock[i][j]==0):
             cellblock[i][j]="-"
 
 
-
-                
+# applies rotational symmetry               
 def symmetry():
     global row,col
     for i in range(0,height):   
@@ -618,11 +598,13 @@ def symmetry():
                         cellblock[row][col]="."
                         canvas.create_rectangle(x0, y0, x1, y1,fill="black", tags=str(row)+","+str(col))
 
+# once the grid has been designed, proceeds to the next step of reviewing clues and assigning solution to the puzzle
 def nxts():
     if val==1:
         master.destroy()
         initUI(width,height,cellblock,across0,down0,xacross,xdown,cn,title,author,)
-        
+
+# calculates cell no. based on the shaded/unshaded cells        
 def calc_cellno():
     global max_cellno,cn
     cellno=[]
@@ -663,6 +645,7 @@ def calc_cellno():
     max_cellno=count
     cn=cellno
 
+# shaded/unshades the cell that has been clicked
 def cell_clicked0(event):
     x, y = event.x, event.y
     if (MARGIN < x < WIDTH - MARGIN and MARGIN < y < HEIGHT - MARGIN):
@@ -682,6 +665,7 @@ def cell_clicked0(event):
                 canvas.create_rectangle(x0, y0, x1, y1,fill="black", tags=str(row)+","+str(col))
         calc_cellno()
 
+# UI that allows user to review and edit the grid design
 def initUI0(cb,w,h):
     global val,master,canvas,cellblock,MARGIN,WIDTH,SIDE,HEIGHT,ex0,ex1,ey0,ey1,width,height,max_cellno
     val=0
@@ -754,15 +738,4 @@ def initUI0(cb,w,h):
     master.mainloop()
 
 initUI0(cellblock,width,height)
-                   
-    
-    
 
-    
-            
-            
-        
-    
-    
-    
-    

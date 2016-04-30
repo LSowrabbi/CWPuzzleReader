@@ -8,7 +8,7 @@ def prevzero(loc):
         j=j-1
     return j+1
 
-# reads the puzzle description from the binary file (path of the file is given by 'loc' attribute of the file instance)
+# reads the partially created puzzle's description (path of the file is given by 'loc' attribute of object 'f')
 def readpuz(f):
     global b
     title=""

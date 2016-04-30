@@ -29,6 +29,7 @@ def calc_down():
                 c_row=c_row+1            
             down[i][3]=curstr
 
+# Notifies user if the entire solution grid is filled with correct entries
 def is_sol_complete():
         for i in range(0,height):
             for j in range(0,width):
@@ -590,7 +591,7 @@ def unlock_soln():
     key = input("Enter the 4 digit key : ") 
     check_key(key)
 
-
+# saves the current state of the puzzle as a text file
 def save_txt():
     getloc=ofile_txt.split("/")
     st=getloc[len(getloc)-1]
@@ -663,6 +664,7 @@ ip=1
 calc_across()
 calc_down()
 print('Enter 1 to Display the option menu anytime')
+# performs actions corresponding to the option selected by the user
 while(ip!=0):
         ip = input('Enter your option: ')
         if(ip=="1"):

@@ -654,7 +654,7 @@ def save_txt():
 
 
 
-# quits program if checksum does not match
+# quits program if given checksum does not match the calculated checksum
 if(valid_cksum==False):
         print("Sorry, the file has been corrupted")
         sys.exit(0)

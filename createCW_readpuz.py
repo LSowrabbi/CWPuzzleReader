@@ -8,6 +8,7 @@ def prevzero(loc):
         j=j-1
     return j+1
 
+# reads the puzzle description from the binary file (path of the file is given by 'loc' attribute of the file instance
 def readpuz(f):
     global b
     title=""
@@ -169,7 +170,8 @@ def readpuz(f):
                     j=temp+1                        
                 else:
                     j=j+1
-                    
+          
+    # assigns all rebus cells in the grid with their corresponding rebus solution          
     for i in range(0,height):
         for j in range(0,width):
             if(is_puz_rebus==True):

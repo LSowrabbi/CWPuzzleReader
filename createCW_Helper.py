@@ -72,7 +72,7 @@ def filewrite(t):
     rebus_usr_entry=False
     rebus=[]
     new_soln=('').encode(Encoding_2)
-    # updates current state of the puzzle
+    # solution block of the puzzle
     for i in range(0,f.height):
         for j in range(0,f.width):   
             if(len(f.solnblock[i][j])>1):
@@ -84,7 +84,7 @@ def filewrite(t):
             j=j+1
         i=i+1
     new_curn=('').encode(Encoding_2)
-    # updates solution block of the puzzle (if it has been unlocked in case of scrambled puzzles)
+     # current state of the puzzle : all the unshaded cells are set to null value (represented by "-") 
     for i in range(0,f.height):
         for j in range(0,f.width):
             if(f.solnblock[i][j]=="."):
@@ -98,6 +98,7 @@ def filewrite(t):
     temp_dwn=0
     cl=[]
     cluelist=('').encode(Encoding_2)
+    # cluelist containing across and down clues (in increasing order of cellno.)
     while(temp_acc!=f.acc and temp_dwn!=f.dwn):
         if(f.across[temp_acc][0]<=f.down[temp_dwn][0]):
             cl.append(f.across[temp_acc][1].encode(Encoding_2))
@@ -117,6 +118,7 @@ def filewrite(t):
             cl.append(f.across[temp_acc][1].encode(Encoding_2))
             cluelist=cluelist+(f.across[temp_acc][1].encode(Encoding_2))+b'\0'
             temp_acc=temp_acc+1
+    # rebus entries along with their location in the grid
     if(rebus_usr_entry==True):
         count=1
         is_present=False

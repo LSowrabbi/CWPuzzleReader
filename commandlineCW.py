@@ -1,5 +1,6 @@
 from commandlineHelper import *
 
+# converts all the cell entries in pencil mode to upper case
 for i in range(0,height):
         for j in range(0,width):
                 if(cellblock[i][j] in 'abcdefghijklmnopqrstuvwxyz'):

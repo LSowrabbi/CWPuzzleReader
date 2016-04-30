@@ -76,6 +76,7 @@ def magic_high_cksum():
     calc_magic_high=calc_magichigh_temp[0]
     return calc_magic_high
 
+# stores the current state of the puzzle in a binary file
 def filewrite(t):
     global f,cib_text,new_soln,new_curn,cluelist,cl,copy_sym
     f=t
@@ -83,7 +84,8 @@ def filewrite(t):
     rebus_usr_entry=False
     rebus=[]
     new_soln=('').encode(Encoding_2)
-    # updates current state of the puzzle
+    
+    # stores solution  of the puzzle in new_soln
     for i in range(0,f.height):
         for j in range(0,f.width):   
             if(len(f.solnblock[i][j])>1):
@@ -95,7 +97,7 @@ def filewrite(t):
             j=j+1
         i=i+1
     new_curn=('').encode(Encoding_2)
-    # updates solution block of the puzzle (if it has been unlocked in case of scrambled puzzles)
+   # stores current state of the grid in new_curn
     for i in range(0,f.height):
         for j in range(0,f.width):
             if(len(f.cellblock[i][j])>1):

@@ -451,7 +451,8 @@ def findcurrdown(i,j):
         curstr=curstr+cellblock[i][j]
         i=i+1
     return curstr
-    
+
+# stores the value for the clue entered by the user in the corresponding cluelist
 def textentered(event=0):
     ip=text.get("1.0",'end-1c')
     if(cur_bool==True and ip!=""):
@@ -472,7 +473,8 @@ def textentered(event=0):
     canvas.focus_set()
     create_rect(row,col)
 
-        
+
+# stores the puzzle description in binary format       
 def save_sol():
     global location
     location=StringVar()
@@ -513,6 +515,8 @@ def save_sol():
         master.destroy()
         sys.exit(0)
 
+
+# stores the puzzle description as a text file
 def save_txt():
     file_opt=opt = {}
     col_space=[]
@@ -655,7 +659,7 @@ def initUI(w,h,cb,across0,down0,xacross,xdown,cell,titl,aut):
     dull_clue_ad="down"
     found_cur=0
     found_dull=0
-    # is_multi==1 is to input multiple entries in a cell, it can be turned off only after 'enter' key is pressed
+# is_multi is set to 1 in order to input rebus entries for a cell; it can be turned off only after 'enter' key is pressed
     is_multi=0
     multi=[]
     count=1

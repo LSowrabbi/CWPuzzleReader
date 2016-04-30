@@ -139,7 +139,7 @@ def filewrite(t):
         count=1
         is_present=False
         new_rtbl=('').encode(Encoding_2)
-        # updates current state of the puzzle
+        # stores the rebus entries in the solution in the 'rebus' list
         for i in range(0,f.height):
             for j in range(0,f.width):
                 temp=9999
@@ -154,12 +154,14 @@ def filewrite(t):
                         count=count+1
                 else:
                     temp=0
+                # 'new_grbs' stores the number corresponding to the rebus entries
                 if(i==0 and j==0):
                     new_grbs=struct.pack('B',temp)
                 else:
                     new_grbs=new_grbs+struct.pack('B',temp)
                 j=j+1
             i=i+1
+        # 'new_rtbl' stores the rebus entry corresponding to each rebus number present in 'new_grbs'
         for i in range (0,len(rebus)):
             temp_str=""
             if(i<10):

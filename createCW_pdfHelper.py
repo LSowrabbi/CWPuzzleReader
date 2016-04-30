@@ -66,27 +66,32 @@ def magic_high_cksum():
     calc_magic_high=calc_magichigh_temp[0]
     return calc_magic_high
 
+# stores the puzzle description in the binary file
 def filewrite(t):
     global f,cib_text,new_soln,new_curn,cluelist,cl,copy_sym
     f=t
     ofile=open(f.loc,mode='wb')
-    new_curn=('').encode(Encoding_2)
-    # updates current state of the puzzle
+    new_soln=('').encode(Encoding_2)
+    # solution block of the puzzle
     for i in range(0,f.height):
         for j in range(0,f.width):   
-            temp=f.solnblock[i][j]
-            new_curn=new_curn+temp.encode(Encoding_2)       
+            if(len(f.solnblock[i][j])>1):
+                rebus_usr_entry=True 
+                temp=f.solnblock[i][j][0]
+            else:
+                temp=f.solnblock[i][j]
+            new_soln=new_soln+temp.encode(Encoding_2)       
             j=j+1
         i=i+1
-    new_soln=('').encode(Encoding_2)
-    # updates solution block of the puzzle (if it has been unlocked in case of scrambled puzzles)
+    new_curn=('').encode(Encoding_2)
+     # current state of the puzzle : all the unshaded cells are set to null value (represented by "-") 
     for i in range(0,f.height):
         for j in range(0,f.width):
             if(f.solnblock[i][j]=="."):
                 temp="."
             else:
-                temp="X"
-            new_soln=new_soln+temp.encode(Encoding_2)       
+                temp="-"
+            new_curn=new_curn+temp.encode(Encoding_2)       
             j=j+1
         i=i+1
     temp_acc=0
@@ -153,8 +158,6 @@ def filewrite(t):
     ofile.write((f.cpyrt).encode(Encoding_2))
     ofile.write(b'\0')
     ofile.write(cluelist)
-    if(f.notes!=""):
-        ofile.write((f.notes).encode(Encoding_2))
     ofile.write(b'\0')  
     ofile.close()
 

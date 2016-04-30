@@ -602,7 +602,7 @@ def symmetry():
 def nxts():
     if val==1:
         master.destroy()
-        initUI(width,height,cellblock,across0,down0,xacross,xdown,cn,title,author,)
+        initUI(width,height,cellblock,across0,down0,xacross,xdown,cn,title,author)
 
 # calculates cell no. based on the shaded/unshaded cells        
 def calc_cellno():

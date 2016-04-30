@@ -35,6 +35,9 @@ checksum_sol.append(0)
 soln_state=[]
 soln_state.append(0)
 
+# function that interacts with the binary (.puz) file
+# if nth edit = 0: reads the puzzle description from the binary file
+# else: writes the current state of the puzzle to the binary file
 def filewrite(nth_edit):
     global ifil,Encoding_1,Encoding_2,Encoding_3,soln_state,puztype,soln,curn_state,b,ifile,valid_cksum,check_reveal_state,unlock_state,notes_state,checksum_sol
     global extra_sec_code,extra_sec_count,extra_sec_length,extra_sec_checksum,extra_sec_data,cluelist,ofile,ofile_txt
@@ -105,7 +108,7 @@ def filewrite(nth_edit):
         start=n
         # loop counter variable for string section
         k=0
-       # offset for the components following title component in the string section. for eg, author,copyright,clues,etc.
+        # offset for the components following title component in the string section. for eg, author,copyright,clues,etc.
         begn=0
 
         prevj=0
@@ -223,7 +226,7 @@ def filewrite(nth_edit):
             
 
 
-	# finds current state of an across or down word, taking the starting row and column for that word as the input
+   # finds current state of an across or down word, taking the starting row and column for that word as the input
     def findcurracross(i,j):
         curstr=""
         while((j<width) and  (cellblock[i][j]!="." and cellblock[i][j]!=":")):
@@ -493,7 +496,7 @@ def filewrite(nth_edit):
         return calc_magic_high
 
     if(nth_edit==0):
-    	# identifies rebus,circles and validity of cells
+    	# identifies rebus, circles and validity of cells
         calc_rebus()
         calc_gext()
         # checks the different checksums against the calculated value   
@@ -664,6 +667,7 @@ def unscramble_solution(scrambled, width, height, key):
     data = restore(sq, unscramble_string(sq.replace('.', ''), key))
     return square(data, height, width)
 
+# unscrambles the scrambled string with 'key'
 def unscramble_string(s, key):
     key = key_digits(key)
     l = len(s)

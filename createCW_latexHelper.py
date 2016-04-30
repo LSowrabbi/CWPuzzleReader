@@ -5,6 +5,8 @@ import tkinter.filedialog
 master = Tk()
 cellblock=[]
 master.destroy()
+
+# instance of 'File' class  stores puzzle description
 class File():
     title=None
     author=None
@@ -452,7 +454,9 @@ def findcurrdown(i,j):
         curstr=curstr+cellblock[i][j]
         i=i+1
     return curstr
-    
+ 
+ 
+# stores the value for the clue entered by the user in the corresponding cluelist   
 def textentered(event=0):
     ip=text.get("1.0",'end-1c')
     if(cur_bool==True and ip!=""):
@@ -472,7 +476,8 @@ def textentered(event=0):
         messagebox.showinfo("Sorry!", msg)
     canvas.focus_set()
     create_rect(row,col)
-        
+
+# stores the puzzle description in binary format        
 def save_sol():
     global location
     location=StringVar()
@@ -512,7 +517,8 @@ def save_sol():
         filewrite(File)
         master.destroy()
         sys.exit(0)
-        
+
+# stores the puzzle description as a text file
 def save_txt():
     file_opt=opt = {}
     col_space=[]
@@ -764,7 +770,7 @@ def initUI(w,h,cb,across0,down0,cellno0,rc,cc):
     filemenu = Menu(menubar, tearoff=0)
     filemenu.add_command(label="Create Puzzle", command=save_sol)  
     filemenu.add_command(label="Copy work to a text file", command=save_txt)
- #   filemenu.add_command(label="Multiple Entry", command=multiple_sol)
+    # filemenu.add_command(label="Multiple Entry", command=multiple_sol)
     filemenu.add_command(label="Clear Puzzle", command=clear_cells)
     menubar.add_cascade(label="File", menu=filemenu) 
     master.config(menu=menubar,background="#D9DADA")   

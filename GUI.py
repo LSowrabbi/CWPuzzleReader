@@ -75,7 +75,7 @@ cur_clue_ad="across"
 dull_clue_ad="down"
 found_cur=0
 found_dull=0
-# is_multi==1 is to input multiple entries in a cell, it can be turned off only after 'enter' key is pressed
+# is_multi is set to 1 in order to input rebus entries for a cell; it can be turned off only after 'enter' key is pressed
 is_multi=0
 multi=[]
 class UI():

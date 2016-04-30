@@ -5,6 +5,7 @@ import json
 across=[]
 down=[]
 solnblock=[]
+# reads the puzzle description from the IPUZ file (path of the file is given by 'loc' attribute of the file instance)
 def read_ipuz(f):
     data_file = open(f.loc,'r')   
     data = data_file.read()
@@ -15,10 +16,12 @@ def read_ipuz(f):
         master.withdraw()
         messagebox.showinfo("Sorry!", "File corrupted")
         sys.exit(0)
+    # 'block' represents the shaded cells in the grid
     if 'block' in puzzle:
         block=puzzle['block']
     else:
         block="#"
+    # 'empty' represents the unshaded cells in the grid that does not hold any value currently
     if 'empty' in puzzle:
         empty=puzzle['empty']
         try:
@@ -43,6 +46,7 @@ def read_ipuz(f):
         notes=puzzle['notes']
     else:
         notes=''
+    # Across and Down cluelist
     if 'Across' in puzzle['clues'] and 'Down' in puzzle['clues']:      
         for i in range(0,len(puzzle['clues']['Across'])):
             l=puzzle['clues']['Across'][i]
@@ -66,6 +70,7 @@ def read_ipuz(f):
         width=int(puzzle['dimensions']['width'])
     else:
         width=puzzle['dimensions']['width']
+    # solnblock represents the solution grid of the puzzle
     for i in range(0,height):
         solnblock.append([])
         for j in range(0,width):
@@ -73,7 +78,7 @@ def read_ipuz(f):
                 solnblock[i].append(puzzle['puzzle'][i][j]['cell'])
             else:
                 solnblock[i].append(puzzle['puzzle'][i][j])           
-            if solnblock[i][j]==block or solnblock[i][j]=="null":
+            if solnblock[i][j]==block or solnblock[i][j]=="null" or solnblock[i][j]==None:
                 solnblock[i][j]="."
             else:
                 if 'solution' in puzzle:
@@ -94,6 +99,7 @@ def read_ipuz(f):
     f.down=down
     return f
 
+# creates an IPUZ file with the help of object 'f' that contains the complete puzzle description 
 def write_ipuz(f):
     puzzle = {'version': "http://ipuz.org/v1", 'kind': ["http://ipuz.org/crossword#1"], 'title': f.title, 'author': f.author, 'copyright': f.cpyrt, 'notes':f.notes};
     puzzle['dimensions']={}

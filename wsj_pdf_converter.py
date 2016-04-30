@@ -650,7 +650,7 @@ def cell_clicked0(event):
     x, y = event.x, event.y
     if (MARGIN < x < WIDTH - MARGIN and MARGIN < y < HEIGHT - MARGIN):
         canvas.focus_set()
-        # get row and col numbers from x,y coordinates
+        # gets row and col numbers from x,y coordinates
         row, col = int((y - MARGIN) / SIDE), int((x - MARGIN) / SIDE)
         if row >= 0 and col >= 0:
             x0 = ex0[row][col]

@@ -65,6 +65,7 @@ def magic_high_cksum():
     calc_magic_high=calc_magichigh_temp[0]
     return calc_magic_high
 
+# stores the puzzle description in the binary file
 def filewrite(t):
     global f,cib_text,new_soln,new_curn,cluelist,cl,copy_sym
     f=t

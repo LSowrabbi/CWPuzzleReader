@@ -347,6 +347,7 @@ class UI():
                  col=col_cellno[no_clicked-1]
                  UI.create_rect(row,col)
 
+    # changes state of the check, reveal and unlock options available in the solution menu
     def change_state(c_state):
         if(c_state=="disabled"):
             UI.solnmenu.entryconfig(0,state=c_state)
@@ -363,7 +364,8 @@ class UI():
         UI.filemenu.entryconfig(4,state=c_state) 
         UI.viewmenu.entryconfig(0,state=c_state)
         return
-                    
+    
+    # displays dialog box if entire grid is filled with correct entries              
     def is_sol_complete():
         for i in range(0,height):
             for j in range(0,width):
@@ -570,7 +572,7 @@ class UI():
                valid[row][col]=1
                UI.create_rect(row,col)
     
-    #clears all the entries in the cells and temporary lists        
+    # clears all the entries in the cells and temporary lists        
     def clear_cells():
             global temp_str
             if(is_multi==0):
@@ -629,7 +631,7 @@ class UI():
           if(ck_val==True):
              messagebox.showinfo("", "No incorrect letters found!!")
     
-    #  checks for the currently highlighted letter    
+    # checks for the currently highlighted letter    
     def check_one():
         v=UI.check(row,col)
         if(v==True and is_multi==0):
@@ -684,7 +686,7 @@ class UI():
             firstIndex = listbox.curselection()[0]
             UI.list_clicked(across[firstIndex][0])
 
-     # when any clue in the down list box is clicked :      
+    # when any clue in the down list box is clicked :      
     def box_clickedD(event):
         global across_down
         if(is_multi==0):
@@ -750,7 +752,7 @@ class UI():
                     UI.reveal_letter(i,j)
         UI.is_sol_complete()
         
-     # reveals solution for all the cells in the highlighted word                           
+    # reveals solution for all the cells in the highlighted word                           
     def reveal_word():
         global across_down
         i=row

@@ -42,6 +42,9 @@ checksum_sol.append(0)
 soln_state=[]
 soln_state.append(0)
 
+# function that interacts with the binary (.puz) file
+# if nth edit = 0: reads the puzzle description from the binary file
+# else: writes the current state of the puzzle in the binary file
 def filewrite(nth_edit,new_t,new_ts):
     global ifil,Encoding_1,Encoding_2,Encoding_3,soln_state,puztype,soln,curn_state,b,ifile,valid_cksum,check_reveal_state,unlock_state,notes_state,checksum_sol
     global extra_sec_code,extra_sec_count,extra_sec_length,extra_sec_checksum,extra_sec_data,cluelist,ofile
@@ -660,7 +663,8 @@ def unscramble_solution(scrambled, width, height, key):
     sq = square(scrambled, width, height)
     data = restore(sq, unscramble_string(sq.replace('.', ''), key))
     return square(data, height, width)
-
+    
+# unscrambles the scrambled string with 'key' 
 def unscramble_string(s, key):
     key = key_digits(key)
     l = len(s)

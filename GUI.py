@@ -3,6 +3,7 @@ from tkinter import *
 from GUI_Helper import *
 from tkinter.messagebox import *
 master = Tk()
+# quits program if given checksum does not match the calculated checksum
 if(valid_cksum==False):
     master.withdraw()
     messagebox.showinfo("Sorry!", "File corrupted")

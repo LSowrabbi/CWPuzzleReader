@@ -1,3 +1,4 @@
+# reads the partially created puzzle's description (path of the file is given by 'loc' attribute of object 'f')
 def readtext(f):
     with open(f.loc,encoding="ISO-8859-1") as k:
         content = k.read().splitlines()
@@ -18,6 +19,7 @@ def readtext(f):
         i=i+1
     i=i+1
     temp=""
+    # reads the puzzle description and saves in the respective variables mentioned above
     while(content[i]!="</TITLE>"):
         temp=temp+content[i]
         i=i+1
@@ -61,6 +63,7 @@ def readtext(f):
         while(content[i]!="</GRID>"):
             j=0
             solnblock.append([])
+            # each entry in the solution grid is seperated by a ',')
             while(True):
                 temp=""
                 while(content[i][j]!=","):
@@ -72,7 +75,8 @@ def readtext(f):
                    break
             r=r+1
             i=i+1
-    i=i+1    
+    i=i+1   
+    # stores the across and down clues that are already input by the user in the respective cluelists
     if(content[i]=="<ACROSS>"):
         i=i+1
         while(content[i]!="</ACROSS>"):
@@ -100,6 +104,7 @@ def readtext(f):
             temp=temp+content[i]
             i=i+1
         notes=temp
+    # stores the read puzzle description in the corrresponding object attributes
     f.title=title
     f.author=author
     f.cpyrt=cpyrt
@@ -114,29 +119,36 @@ def readtext(f):
     f.loc=""
     return f
 
+# writes the data corresponding to the partially complete puzzle to a text file
 def writetext(f):
     Encoding_2 = "ISO-8859-1" 
     ofile=open(f.loc,mode='wb')
+    #  title of the puzzle
     ofile.write(("<TITLE>"+"\n").encode(Encoding_2))
     msg=f.title+"\n"
     ofile.write(msg.encode(Encoding_2))
     ofile.write(("</TITLE>"+"\n").encode(Encoding_2))
+    #  author of the puzzle
     ofile.write(("<AUTHOR>"+"\n").encode(Encoding_2))
     msg=f.author+"\n"
     ofile.write(msg.encode(Encoding_2))
     ofile.write(("</AUTHOR>"+"\n").encode(Encoding_2))
+    #  puzzle's copyright
     ofile.write(("<COPYRIGHT>"+"\n").encode(Encoding_2))
     msg=f.cpyrt+"\n"
     ofile.write(msg.encode(Encoding_2))
     ofile.write(("</COPYRIGHT>"+"\n").encode(Encoding_2))
+    #  width of the puzzle
     ofile.write(("<WIDTH>"+"\n").encode(Encoding_2))
     msg=str(f.width)+"\n"
     ofile.write(msg.encode(Encoding_2))
     ofile.write(("</WIDTH>"+"\n").encode(Encoding_2))
+    #  height of the puzzle
     ofile.write(("<HEIGHT>"+"\n").encode(Encoding_2))
     msg=str(f.height)+"\n"
     ofile.write(msg.encode(Encoding_2))
     ofile.write(("</HEIGHT>"+"\n").encode(Encoding_2))
+    # solution grid of the puzzle
     ofile.write(("<GRID>"+"\n").encode(Encoding_2))
     for i in range(0,f.height):
         for j in range(0,f.width):
@@ -144,6 +156,8 @@ def writetext(f):
             ofile.write(msg.encode(Encoding_2))
         ofile.write(("\n").encode(Encoding_2))
     ofile.write(("</GRID>"+"\n").encode(Encoding_2))
+    # across and down cluelist
+    # if the user has not yet entered a clue for a specific across or down clue, the corresponding clue value is represented by "NULL"
     ofile.write(("<ACROSS>"+"\n").encode(Encoding_2))
     for i in range(0,f.acc):
         if(f.across[i][1]==""):
@@ -160,6 +174,7 @@ def writetext(f):
             msg=f.down[i][1]+"\n"
         ofile.write(msg.encode(Encoding_2))
     ofile.write(("</DOWN>"+"\n").encode(Encoding_2))
+    # notes related to the puzzle (optional)
     ofile.write(("<NOTEPAD>"+"\n").encode(Encoding_2))
     msg=f.notes+"\n"
     ofile.write(msg.encode(Encoding_2))

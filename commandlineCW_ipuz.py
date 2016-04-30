@@ -22,7 +22,7 @@ class File():
     loc=""
 
 
-# is_multi==1 is to input multiple entries in a cell, it can be turned off only after 'enter' key is pressed
+# is_multi is set to 1 in order to input rebus entries for a cell; it can be turned off only after 'enter' key is pressed
 is_multi=0
 multi=[]
 across=[]
@@ -42,14 +42,12 @@ ofile_txt=ifil
 data_file = open(ifil,'r')   
 data = data_file.read()
 data_file.close()
+# puzzle description read from the ipuz file is stored in the 'puzzle' instance
 try:
     puzzle = ipuz.read(data)
 except ipuz.IPUZException:
     print("Sorry, File corrupted")
     sys.exit(0)
-#puzzle['dimensions']['width']=5
-#d2 = {2: 'ha!', 3: 3}
-#puzzle.update(d2)
 if 'block' in puzzle:
     block=puzzle['block']
 else:
@@ -109,11 +107,17 @@ if isinstance(puzzle['dimensions']['width'],str):
 else:
     width=puzzle['dimensions']['width']
 for i in range(0,height):
+    # current state of the grid
     cellblock.append([])
+    # stores the position of cell numbers for cells in the grid
     cellno.append([])
+    # stores all the pencil entries in the grid
     pencil.append([])
+    # stores the valid/invalid state of each entry in the grid
     valid.append([])
+    # if available, stores the solution for puzzle; else all cell entries are assigned the character 'A'
     solnblock.append([])
+    # stores details of circled, previously incorrect, incorrect or revealed entries present in the grid
     gext.append([])
     for j in range(0,width):
         pencil[i].append(0)
@@ -129,10 +133,11 @@ for i in range(0,height):
             cellno[i].append(cellblock[i][j])
         else:
             cellno[i].append(0)            
-        if cellblock[i][j]==block or cellblock[i][j]=="null":
+        if cellblock[i][j]==block or cellblock[i][j]=="null" or cellblock[i][j]==None:
             cellblock[i][j]="."
             solnblock[i].append(".")
         else:
+            # if an unshaded cell is encountered and any entry is present in it, stores the corresponding entry in the cell
             if 'saved' in puzzle:
                 if isinstance(puzzle['saved'][i][j],dict):
                     cellblock[i][j]=puzzle['saved'][i][j]['value']
@@ -191,6 +196,7 @@ def calc_down(ch=1):
             else:
                 down[i][3]=curstr
 
+# Notifies user if entire grid is filled with correct entries
 def is_sol_complete():
         for i in range(0,height):
             for j in range(0,width):
@@ -752,6 +758,7 @@ def unlock_soln():
     key = input("Enter the 4 digit key : ") 
     check_key(key)
 
+# overrides the IPUZ file with the current state of the puzzle
 def save_sol():
         temp_l=[]
         for i in range(0,height):
@@ -789,6 +796,7 @@ def save_sol():
         ofile.write(data)
         ofile.close()
 
+# saves the current state of the puzzle in binary format
 def save_puz():
     getloc=ofile_txt.split("/")
     st=getloc[len(getloc)-1]
@@ -824,7 +832,8 @@ def save_puz():
     File.down=down
     File.loc=op
     ipuz_Helper.filewrite(File)
-        
+
+# saves the current state of the puzzle as a text file        
 def save_txt():
     getloc=ofile_txt.split("/")
     st=getloc[len(getloc)-1]
@@ -888,6 +897,7 @@ time_state=1
 ip=1
 calc_across(0)
 calc_down(0)
+# performs actions corresponding to the option selected by the user
 print('Enter 1 to Display the option menu anytime')
 while(ip!=0):
         ip = input('Enter your option: ')

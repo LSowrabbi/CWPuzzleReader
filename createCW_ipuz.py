@@ -7,6 +7,7 @@ import tkinter.filedialog
 master = Tk()
 cellblock=[]
 
+# instance of 'File' class stores puzzle description
 class File():
     title=None
     author=None
@@ -22,6 +23,7 @@ class File():
     down=[]
     loc=""
 
+# shades/unshades the cell clicked
 def cell_clicked0(event):
     x, y = event.x, event.y
     if (MARGIN < x < WIDTH - MARGIN and MARGIN < y < HEIGHT - MARGIN):
@@ -40,7 +42,7 @@ def cell_clicked0(event):
                 cellblock[row][col]="."
                 canvas.create_rectangle(x0, y0, x1, y1,fill="black", tags=str(row)+","+str(col))
 
-
+# clears the grid
 def clear_cells0():
     canvas.delete("cursor")
     for i in range(0,height):   
@@ -49,6 +51,7 @@ def clear_cells0():
                 cellblock[i][j]="-"
                 canvas.delete(str(i)+","+str(j))
 
+# applies rotational symmetry to the grid
 def symmetry():
     global row,col
     for i in range(0,height):   
@@ -67,12 +70,13 @@ def symmetry():
                         cellblock[row][col]="."
                         canvas.create_rectangle(x0, y0, x1, y1,fill="black", tags=str(row)+","+str(col))
 
+# shows the puzzle creator UI once the grid is designed
 def nxts():
     if val==1:
         master.destroy()
         initUI()
 
-         
+ # UI to design the grid         
 def initUI0(cb,w,h):
     global val,master,canvas,cellblock,MARGIN,WIDTH,SIDE,HEIGHT,ex0,ex1,ey0,ey1,width,height
     val=0
@@ -148,8 +152,8 @@ def initUI0(cb,w,h):
     canvas.bind("<Button-1>", cell_clicked0)
     master.mainloop()
 
-
-
+# checks if puzzle description data(title,author,copyright,width and height of the puzzle) have been entered by the user
+# if all details are present, it thenproceeds to grid designing
 def check():
     global width,height,cellblock,title,author,cpyrt,notes
     temp=True
@@ -184,7 +188,7 @@ def check():
         initUI0(cellblock,width,height)
         
         
-
+# gets title,author,copyright,notes,width and height of the puzzle from the user
 def createEntryWindow():
     global get_title,get_author,get_cpyrt,get_width,get_height,get_notes,window
     get_title=StringVar()
@@ -249,9 +253,14 @@ def createEntryWindow():
     b.pack(pady=5,fill=Y)
     master.mainloop()
 
+# initial UI to input user's choice
+# choice 0 = Create a new IPUZ file
+# choice 1 = Open partially a partially created puzzle
+# choice 2 = Open an existing binary (.puz) file
+# choice 3 = Open an existing IPUZ file
 def comboWindow():
     global choice,choices,options,window0,option
-    option = ["Create new .puz","Open partially completed text file","Open .puz file","Open .ipuz file"]
+    option = ["Create new puzzle","Open partially completed text file","Open .puz file","Open .ipuz file"]
     window0 = Toplevel(master)
     master.withdraw()
     fm=Frame(window0,width=60,height=20)
@@ -272,8 +281,10 @@ def open_choice():
     global width,height,cellblock,title,author,cpyrt,notes,x,p,choice
     window0.destroy()
     if(choices.get()==option[0]):
+        # proceeds to get details(like title,author,copyright,width,height,notes) of the puzzle to be created
         choice=option[0]
         createEntryWindow()
+    # reads data related to the partially created puzzle
     if(choices.get()==option[1]):
         choice=option[1]
         ftypes = [('Text files', '*.txt'), ('All files', '*')]
@@ -290,7 +301,7 @@ def open_choice():
         height=x.height
         cellblock=x.solnblock
         initUI()
-        
+    # reads puzzle description from an already existing binary file 
     if(choices.get()==option[2]):
         choice=option[2]
         ftypes = [('Puz files', '*.puz'), ('All files', '*')]
@@ -307,7 +318,7 @@ def open_choice():
         height=p.height
         cellblock=p.solnblock
         initUI()
-
+    # reads puzzle description from an already existing IPUZ file 
     if(choices.get()==option[3]):
         choice=option[3]
         ftypes = [('Ipuz files', '*.ipuz'), ('All files', '*')]
@@ -760,7 +771,8 @@ def findcurrdown(i,j):
         curstr=curstr+cellblock[i][j]
         i=i+1
     return curstr
-    
+
+# stores the value for the clue entered by the user in the corresponding cluelist    
 def textentered(event=0):
     ip=text.get("1.0",'end-1c')
     if(cur_bool==True and ip!=""):
@@ -781,8 +793,7 @@ def textentered(event=0):
     canvas.focus_set()
     create_rect(row,col)
 
-    
-
+# saves the partially completed puzzle
 def save_sol_text():
         file_opt=opt = {}
         opt['filetypes'] = [('all files', '.*'), ('text files', '.txt')]
@@ -803,6 +814,7 @@ def save_sol_text():
         writetext(File)
         messagebox.showinfo("", "Puzzle has been saved as text file successfully")
 
+# stores the puzzle description (in binary format if save_choice is 0; in IPUZ format if save_choice is 1)
 def save_sol(save_choice):
     global location
     location=StringVar()
@@ -860,6 +872,7 @@ def save_sol(save_choice):
        master.destroy()
        sys.exit(0)
 
+# stores the puzzle description as a text file
 def save_txt():
     file_opt=opt = {}
     col_space=[]

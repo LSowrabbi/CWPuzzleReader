@@ -149,6 +149,7 @@ for i in range(0,height):
                     cellblock[i][j]=cellblock[i][j].upper()
             else:
                 cellblock[i][j]="-"
+            # if an unshaded cell is encountered, stores the solution for the corresponding cell
             if 'solution' in puzzle:
                 check_reveal_state="normal"
                 if isinstance(puzzle['solution'][i][j],dict):

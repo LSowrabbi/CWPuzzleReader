@@ -38,7 +38,7 @@ for j  in range(len(arr)):
     str1=arr[j][0]
     array.append(str1.split('}'))
 
-# finds the width and height of the array from the array
+# finds the width and height of the grid that are given as arguments to begin{Puzzle}
 for i in range(0,len(array)):
     if("\\begin{Puzzle" in array[i]):
         ind=array[i].index("\\begin{Puzzle")
@@ -61,6 +61,7 @@ cellblock0=[]
 cellno0=[]
 row_cno=[]
 col_cno=[]
+# cellblock0 and cellno0 represents the grid and cellno for each cell present in the grid respectively
 for i in range(height):   
     cellblock0.append([])
     cellno0.append([])
@@ -70,6 +71,7 @@ for i in range(height):
 i=index+1
 row=0
 col=0
+# finds the grid entries
 while('\\end{Puzzle' not in array[i]):
     array[i][0].replace(" ","")
     temp=array[i][0].split('|')
@@ -105,6 +107,7 @@ while('\\end{Puzzle' not in array[i]):
 i=i+1
 across0=[]
 a=0
+# filters the across cluelist from the array
 while(['\\begin{PuzzleClues','{\\textbf{Across'] in array[i]):
     i=i+1
 i=i+1
@@ -139,6 +142,7 @@ while('\\end{PuzzleClues' not in array[i]):
 i=i+1
 down0=[]
 d=0
+# filters the down cluelist from the array
 while(['\\begin{PuzzleClues','{\\textbf{Down'] in array[i]):
     i=i+1
 i=i+1    
@@ -170,12 +174,11 @@ while('\\end{PuzzleClues' not in array[i]):
                 d=d+1
             j=j+1               
     i=i+1
+
+# exits the program if across/down cluelist could not be found
 if(len(across0)==0 or len(down0)==0):
     sys.exit(0)
 else:
     initUI(width,height,cellblock0,across0,down0,cellno0,row_cno,col_cno)
-#for i in range(0,len(across)):
-#    print(str(across[i][0])+","+across[i][1])
-#for i in range(0,len(down)):
-#    print(str(down[i][0])+","+down[i][1])
+
 

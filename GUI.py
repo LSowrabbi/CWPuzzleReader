@@ -936,10 +936,12 @@ class UI():
             listbox1.config(yscrollcommand=scrollbar1.set)
             scrollbar1.config(command=listbox1.yview)
 
+    # saves the current state of the puzzle in the binary file
     def save_sol():
         filewrite(1,sec,time_state)
         messagebox.showinfo("", "saved successfully")
-        
+    
+    # saves the current state of the puzzle as a text file     
     def save_txt():
         file_opt=opt = {}
         col_space=[]
@@ -995,6 +997,7 @@ class UI():
             ofl.write(temp.encode(Encoding_2))
         ofl.close()
 
+    # inserts a prefix '\' to special characters in Latex so that it is printed as it is
     def replace_spl_char(tex_str):
         tex_str=tex_str.replace("_","\_")
         tex_str=tex_str.replace("&","\&")
@@ -1008,6 +1011,7 @@ class UI():
         tex_str=tex_str.replace("}","\}")
         return tex_str
     
+    # saves puzzle in LaTex format 
     def save_latex():
         file_opt=opt = {}
         col_space=[]
@@ -1057,6 +1061,7 @@ class UI():
         ofl.write(("\\end{document}\n").encode(Encoding_2))
         ofl.close()
 
+    # unlocks the solution if the key entered by the user is valid key
     def check_key():
         global check_reveal_state,unlock_state,soln_state,checksum_sol
         ab=unscramble_solution(soln.decode(Encoding_2), width, height, int(key.get()))
@@ -1094,7 +1099,7 @@ class UI():
         else:
             messagebox.showinfo("Sorry", "Wrong key")
 
-        
+    # allows user to enter the key inorder to unlock the puzzle   
     def unlock_soln():
         global window,key
         key=StringVar()

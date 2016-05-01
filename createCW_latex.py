@@ -109,9 +109,12 @@ across0=[]
 a=0
 i=0
 # filters the across cluelist from the array
-while(['\\begin{PuzzleClues','{\\textbf{Across'] in array[i]):
-    i=i+1
-i=i+1
+while(True):
+    if('\\begin{PuzzleClues' in array[i] and '{\\textbf{Across' in array[i]):
+        break
+    else:
+        i=i+1
+
 while('\\end{PuzzleClues' not in array[i]):
     if(len(array[i])!=1):
         j=0
@@ -145,8 +148,11 @@ down0=[]
 d=0
 i=0
 # filters the down cluelist from the array
-while(['\\begin{PuzzleClues','{\\textbf{Down'] in array[i]):
-    i=i+1
+while(True):
+    if('\\begin{PuzzleClues' in array[i] and '{\\textbf{Down' in array[i]):
+        break
+    else:
+        i=i+1
 i=i+1    
 while('\\end{PuzzleClues' not in array[i]):
     if(len(array[i])!=1):

@@ -107,6 +107,7 @@ while('\\end{Puzzle' not in array[i]):
 i=i+1
 across0=[]
 a=0
+i=0
 # filters the across cluelist from the array
 while(['\\begin{PuzzleClues','{\\textbf{Across'] in array[i]):
     i=i+1
@@ -142,6 +143,7 @@ while('\\end{PuzzleClues' not in array[i]):
 i=i+1
 down0=[]
 d=0
+i=0
 # filters the down cluelist from the array
 while(['\\begin{PuzzleClues','{\\textbf{Down'] in array[i]):
     i=i+1

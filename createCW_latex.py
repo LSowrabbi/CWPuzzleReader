@@ -114,7 +114,7 @@ while(True):
         break
     else:
         i=i+1
-
+i=i+1
 while('\\end{PuzzleClues' not in array[i]):
     if(len(array[i])!=1):
         j=0

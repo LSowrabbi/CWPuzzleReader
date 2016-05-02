@@ -1025,20 +1025,6 @@ class UI():
         ofl.write(("\\documentclass{article}\n").encode(Encoding_2))
         ofl.write(("\\usepackage[unboxed]{cwpuzzle}\n").encode(Encoding_2))       
         ofl.write(("\\begin{document}\n").encode(Encoding_2))
-        ofl.write(("\\begin{Puzzle}{"+str(width)+"}{"+str(height)+"}\n").encode(Encoding_2))
-        for i in range (0,height):
-            temp=""
-            for j in range (0,width):
-                temp=temp+"|"               
-                if(solnblock[i][j] in [".",":"]):
-                    temp=temp+"*  "
-                else:
-                    if(cellno[i][j]!=0):
-                        temp=temp+"["+str(cellno[i][j])+"]"                     
-                    temp=temp+solnblock[i][j]+" "
-            temp=temp+"|."
-            ofl.write((temp+"\n").encode(Encoding_2))
-        ofl.write(("\\end{Puzzle}\n").encode(Encoding_2))
         ofl.write(("\\begin{PuzzleClues}{\\textbf{Across}}\n").encode(Encoding_2))
         for i in range(0,acc):
             ct=across[i][0]
@@ -1059,6 +1045,21 @@ class UI():
             temp="\\Clue{"+str(down[i][0])+"}{"+temp_st+"}{"+temp_st1+"}"
             ofl.write((temp+"\n").encode(Encoding_2))
         ofl.write(("\\end{PuzzleClues}\n").encode(Encoding_2))           
+        ofl.write(("\\PuzzleSolution\n").encode(Encoding_2))
+        ofl.write(("\\begin{Puzzle}{"+str(width)+"}{"+str(height)+"}\n").encode(Encoding_2))
+        for i in range (0,height):
+            temp=""
+            for j in range (0,width):
+                temp=temp+"|"               
+                if(cellblock[i][j] in [".",":"]):
+                    temp=temp+"*  "
+                else:
+                    if(cellno[i][j]!=0):
+                        temp=temp+"["+str(cellno[i][j])+"]"                     
+                    temp=temp+cellblock[i][j]+" "
+            temp=temp+"|."
+            ofl.write((temp+"\n").encode(Encoding_2))
+        ofl.write(("\\end{Puzzle}\n").encode(Encoding_2))
         ofl.write(("\\end{document}\n").encode(Encoding_2))
         ofl.close()
 

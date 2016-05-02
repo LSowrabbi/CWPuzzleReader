@@ -1044,7 +1044,8 @@ class UI():
             temp_st1=UI.replace_spl_char(down[i][1])
             temp="\\Clue{"+str(down[i][0])+"}{"+temp_st+"}{"+temp_st1+"}"
             ofl.write((temp+"\n").encode(Encoding_2))
-        ofl.write(("\\end{PuzzleClues}\n").encode(Encoding_2))           
+        ofl.write(("\\end{PuzzleClues}\n").encode(Encoding_2)) 
+        ofl.write(("\\newline\n").encode(Encoding_2)) 
         ofl.write(("\\PuzzleSolution\n").encode(Encoding_2))
         ofl.write(("\\begin{Puzzle}{"+str(width)+"}{"+str(height)+"}\n").encode(Encoding_2))
         for i in range (0,height):

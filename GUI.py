@@ -1053,6 +1053,8 @@ class UI():
                 temp=temp+"|"               
                 if(cellblock[i][j] in [".",":"]):
                     temp=temp+"*  "
+                elif(cellblock[i][j]=="-"):
+                    temp=temp+"\ "
                 else:
                     if(cellno[i][j]!=0):
                         temp=temp+"["+str(cellno[i][j])+"]"                     

@@ -11,7 +11,7 @@ solved=cellblock
 waitlist=[]
 
 # loads the cluelist stored in clues.p
-clues = pickle.load(open("/Users/arunprakashlakshminarayanan/Documents/clues.p",'rb'),encoding=Encoding_2)
+clues = pickle.load(open("/Users/Documents/clues.p",'rb'),encoding=Encoding_2)
 print("--- %s seconds ---" % (t.time() - start_time))
 al=[]
 dl=[]

@@ -22,7 +22,7 @@ def readpuz(f):
     is_puz_rebus=False
     rebus_no=[]
     rebus_row_col=[]
-    rebus_content=[]
+    rebus_usr_content=[]
     ifile = open(f.loc,'rb')
     Encoding_2 = "ISO-8859-1"
     b1 = ifile.read();

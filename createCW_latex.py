@@ -30,8 +30,6 @@ with open(ifil,"r",encoding='utf-8') as ins:
         else:
             arr.append(x)
         
-
-
 array=[]
 # splits the array based on the arguments (end of the argument is detected by '}') 
 for j  in range(len(arr)):

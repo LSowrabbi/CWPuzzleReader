@@ -152,7 +152,7 @@ def readpuz(f):
                 
         # finds the rebus solution for the corresponding rows and columns.
         if(extra_sec_code[i]==b'RTBL'):
-            temp_s=extra_sec_data[i].decode(Encoding_3)
+            temp_s=extra_sec_data[i].decode(Encoding_2)
             j=0
             while(j<len(temp_s)):
                 if(temp_s[j]==':'):
